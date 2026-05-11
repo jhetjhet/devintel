@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: devintel
+      POSTGRES_PASSWORD: devintel
+      POSTGRES_DB: devintel
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devintel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal_net
+
+  devintel-api:
+    build:
+      context: ./devintel-api
+    restart: unless-stopped
+    env_file:
+      - ./devintel-api/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./devintel-api:/app
+      # Mount host Docker socket so the API can spawn worker containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - devintel_net
+      - internal_net
+
+networks:
+  devintel_net:
+    external: true
+  internal_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
