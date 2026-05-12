@@ -25,7 +25,7 @@ _active_tasks: dict[str, asyncio.Task] = {}
 # Docker helpers (sync — called via asyncio.to_thread)
 # ---------------------------------------------------------------------------
 
-def _ensure_container_running(repo_url: str, repository_id: str) -> None:
+def _ensure_container_running(repo_url: str, repository_id: str, commit_hash: str) -> None:
     """
     Checks whether a worker container for this repository is already running.
     Spawns one if not.
@@ -47,7 +47,7 @@ def _ensure_container_running(repo_url: str, repository_id: str) -> None:
     client.containers.run(
         image=settings.DEVINTEL_ENGINE_IMAGE,
         name=container_name,
-        command=["python3", "/app/orchestrator.py", repo_url, repository_id],
+        command=["python3", "/app/orchestrator.py", repo_url, repository_id, commit_hash],
         environment={
             "LLM_API_KEY": settings.LLM_API_KEY,
             "LLM_MODEL": settings.LLM_MODEL,
@@ -142,7 +142,7 @@ async def on_connect(sid: str, environ: dict, auth: dict | None = None):
 
     # Spawn worker container (idempotent — skips if already running)
     try:
-        await asyncio.to_thread(_ensure_container_running, repo.repo_url, repository_id)
+        await asyncio.to_thread(_ensure_container_running, repo.repo_url, repository_id, repo.latest_commit_hash or "")
     except Exception:
         logger.exception("Failed to spawn container for repository %s (sid=%s)", repository_id, sid)
         return False
