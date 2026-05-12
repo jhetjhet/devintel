@@ -1,0 +1,545 @@
+{
+  "full_audit_report": {
+    "job_id": "MANUAL_JOB_1234",
+    "repo_url": "https://github.com/jhetjhet/fooflix.git",
+    "status": "completed",
+    "timestamp": "2026-05-09T17:20:04.295436+00:00",
+    "deterministic_report": {
+      "repository_summary": {
+        "name": "tmpakfyyy4v",
+        "languages": [
+          "javascript",
+          "typescript"
+        ],
+        "frameworks": [
+          "nextjs",
+          "react"
+        ],
+        "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+        "branch": "main",
+        "file_count": 164,
+        "detected_pattern": "monorepo"
+      },
+      "analysis_metrics": {
+        "total_functions": 436,
+        "avg_function_length": 25.5,
+        "high_complexity_functions": 32,
+        "test_coverage_estimate": 0,
+        "todo_count": 0
+      },
+      "finding_summary": {
+        "total_findings": 79,
+        "total_smells": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 49
+        },
+        "by_kind": {
+          "general": 49
+        }
+      },
+      "top_risky_entities": [
+        {
+          "rank": 1,
+          "entity_id": "ENTT-11C9BE09",
+          "name": "CreatePageState",
+          "file": "app/create/create-page-state.tsx",
+          "pain_score": 37.3
+        },
+        {
+          "rank": 2,
+          "entity_id": "ENTT-2028E88C",
+          "name": "MediaInfo",
+          "file": "components/media-info.tsx",
+          "pain_score": 37.3
+        },
+        {
+          "rank": 3,
+          "entity_id": "ENTT-51428015",
+          "name": "useFormActions",
+          "file": "hooks/use-form-actions.ts",
+          "pain_score": 37.3
+        },
+        {
+          "rank": 4,
+          "entity_id": "ENTT-68F805D3",
+          "name": "UploadForm",
+          "file": "components/upload-form/index.tsx",
+          "pain_score": 37.3
+        },
+        {
+          "rank": 5,
+          "entity_id": "ENTT-6CF17AA9",
+          "name": "useUnifiedMedia",
+          "file": "hooks/use-unified-media.ts",
+          "pain_score": 37.3
+        }
+      ],
+      "cluster_summary": {
+        "total_clusters": 9,
+        "hotspot_clusters": 4,
+        "total_clustered": 27,
+        "total_pain_in_clusters": 842.5,
+        "hotspot_files": [
+          "app/watch-together/movie/[roomId]/_components/wt-client-page.tsx",
+          "components/flix-form-manager.tsx",
+          "components/media-info.tsx",
+          "components/ui/chart.tsx"
+        ],
+        "top_clusters": [
+          {
+            "rank": 1,
+            "cluster_id": "CLST-174D5DD7",
+            "anchor_file": "components/media-info.tsx",
+            "total_pain": 199.9,
+            "members": 7,
+            "is_hotspot": true
+          },
+          {
+            "rank": 2,
+            "cluster_id": "CLST-C6394155",
+            "anchor_file": "app/watch-together/movie/[roomId]/_components/wt-client-page.tsx",
+            "total_pain": 130.9,
+            "members": 4,
+            "is_hotspot": true
+          },
+          {
+            "rank": 3,
+            "cluster_id": "CLST-7EE64D9C",
+            "anchor_file": "components/flix-form-manager.tsx",
+            "total_pain": 96,
+            "members": 3,
+            "is_hotspot": true
+          }
+        ]
+      },
+      "dependency_summary": {
+        "coupling_score": 0.0016,
+        "cycles_count": 2,
+        "cycle_files": [
+          "components/ui/sonner.tsx",
+          "components/ui/input-otp.tsx"
+        ],
+        "outdated_packages": [
+          {
+            "name": "@hookform/resolvers",
+            "current": "3.9.1",
+            "recommended": "5.2.2"
+          },
+          {
+            "name": "@tailwindcss/postcss",
+            "current": "4.2.0",
+            "recommended": "4.3.0"
+          },
+          {
+            "name": "autoprefixer",
+            "current": "10.4.20",
+            "recommended": "10.5.0"
+          },
+          {
+            "name": "axios",
+            "current": "1.15.2",
+            "recommended": "1.16.0"
+          },
+          {
+            "name": "lucide-react",
+            "current": "0.564.0",
+            "recommended": "1.14.0"
+          },
+          {
+            "name": "next",
+            "current": "16.2.0",
+            "recommended": "16.2.6"
+          },
+          {
+            "name": "postcss",
+            "current": "8.5",
+            "recommended": "8.5.14"
+          },
+          {
+            "name": "react",
+            "current": "19.2.4",
+            "recommended": "19.2.6"
+          },
+          {
+            "name": "react-day-picker",
+            "current": "9.13.2",
+            "recommended": "10.0.0"
+          },
+          {
+            "name": "react-dom",
+            "current": "19.2.4",
+            "recommended": "19.2.6"
+          },
+          {
+            "name": "react-hook-form",
+            "current": "7.54.1",
+            "recommended": "7.75.0"
+          },
+          {
+            "name": "react-resizable-panels",
+            "current": "2.1.7",
+            "recommended": "4.11.0"
+          },
+          {
+            "name": "recharts",
+            "current": "2.15.0",
+            "recommended": "3.8.1"
+          },
+          {
+            "name": "sonner",
+            "current": "1.7.1",
+            "recommended": "2.0.7"
+          },
+          {
+            "name": "swr",
+            "current": "2.2.5",
+            "recommended": "2.4.1"
+          },
+          {
+            "name": "tailwind-merge",
+            "current": "3.3.1",
+            "recommended": "3.5.0"
+          },
+          {
+            "name": "tailwindcss",
+            "current": "4.2.0",
+            "recommended": "4.3.0"
+          },
+          {
+            "name": "tw-animate-css",
+            "current": "1.3.3",
+            "recommended": "1.4.0"
+          },
+          {
+            "name": "typescript",
+            "current": "5.7.3",
+            "recommended": "6.0.3"
+          },
+          {
+            "name": "zod",
+            "current": "3.24.1",
+            "recommended": "4.4.3"
+          },
+          {
+            "name": "zustand",
+            "current": "5.0.3",
+            "recommended": "5.0.13"
+          }
+        ],
+        "unused_dependencies": [
+          "@hookform/resolvers",
+          "@tailwindcss/postcss",
+          "@types/node",
+          "@types/react-dom",
+          "autoprefixer",
+          "date-fns",
+          "plyr",
+          "plyr-react",
+          "postcss",
+          "react-dom",
+          "tailwindcss",
+          "tw-animate-css",
+          "typescript"
+        ]
+      },
+      "file_structure_health": [
+        {
+          "path": "app/create",
+          "health_score": 63,
+          "file_count": 2,
+          "status": "warning"
+        },
+        {
+          "path": "hooks",
+          "health_score": 64,
+          "file_count": 6,
+          "status": "warning"
+        },
+        {
+          "path": "components/upload-form",
+          "health_score": 64,
+          "file_count": 3,
+          "status": "warning"
+        },
+        {
+          "path": "app/browse",
+          "health_score": 64,
+          "file_count": 1,
+          "status": "warning"
+        },
+        {
+          "path": "app/watch-together",
+          "health_score": 67,
+          "file_count": 4,
+          "status": "warning"
+        },
+        {
+          "path": "components/video-player2",
+          "health_score": 70,
+          "file_count": 2,
+          "status": "good"
+        },
+        {
+          "path": "components",
+          "health_score": 71,
+          "file_count": 18,
+          "status": "good"
+        },
+        {
+          "path": "components/ui",
+          "health_score": 71,
+          "file_count": 5,
+          "status": "good"
+        },
+        {
+          "path": "services",
+          "health_score": 77,
+          "file_count": 1,
+          "status": "good"
+        },
+        {
+          "path": "components/media-page",
+          "health_score": 77,
+          "file_count": 1,
+          "status": "good"
+        },
+        {
+          "path": ".",
+          "health_score": 77,
+          "file_count": 1,
+          "status": "good"
+        }
+      ],
+      "security_audit": {
+        "critical_count": 0,
+        "high_count": 0,
+        "medium_count": 0,
+        "low_count": 0,
+        "vulnerabilities": []
+      },
+      "quick_wins": [
+        {
+          "id": "win_1",
+          "title": "Code Issue",
+          "description": "app/browse/_components/browse-content.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/browse/_components/browse-content.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_2",
+          "title": "Code Issue",
+          "description": "app/create/create-page-state.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/create/create-page-state.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_3",
+          "title": "Code Issue",
+          "description": "app/create/search-results.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/create/search-results.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_4",
+          "title": "Code Issue",
+          "description": "app/watch-together/movie/[roomId]/_components/wt-client-page.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/watch-together/movie/[roomId]/_components/wt-client-page.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_5",
+          "title": "Code Issue",
+          "description": "app/watch-together/movie/[roomId]/_components/wt-host-page.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/watch-together/movie/[roomId]/_components/wt-host-page.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_6",
+          "title": "Code Issue",
+          "description": "app/watch-together/movie/[roomId]/_components/wt-page-container.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/watch-together/movie/[roomId]/_components/wt-page-container.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_7",
+          "title": "Code Issue",
+          "description": "app/watch-together/movie/[roomId]/page.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "app/watch-together/movie/[roomId]/page.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_8",
+          "title": "Code Issue",
+          "description": "components/auth-modal.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "components/auth-modal.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_9",
+          "title": "Code Issue",
+          "description": "components/backdrops-gallery.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "components/backdrops-gallery.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        },
+        {
+          "id": "win_10",
+          "title": "Code Issue",
+          "description": "components/browse-filters.tsx:0 — ",
+          "impact": "Low",
+          "type": "general",
+          "metadata": {
+            "detected_by": "deterministic_analyzer",
+            "confidence": 0,
+            "source_files": [
+              "components/browse-filters.tsx"
+            ],
+            "commit_hash": "182add6d8b4001a5959f3204908aacf6f3a717e7",
+            "analysis_version": "v1.0.0",
+            "rule_id": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    "llm_insights": {
+      "overall_score": 60,
+      "technical_debt_score": 55,
+      "growth_pts": 6,
+      "radar_metrics": [
+        {
+          "subject": "Maintainability",
+          "score": 65,
+          "max": 100
+        },
+        {
+          "subject": "Scalability",
+          "score": 80,
+          "max": 100
+        },
+        {
+          "subject": "Security",
+          "score": 100,
+          "max": 100
+        },
+        {
+          "subject": "Performance",
+          "score": 15,
+          "max": 100
+        },
+        {
+          "subject": "Test Coverage",
+          "score": 10,
+          "max": 100
+        },
+        {
+          "subject": "Architecture",
+          "score": 88,
+          "max": 100
+        }
+      ],
+      "overall_verdict": "Needs Review",
+      "confidence": 0.85,
+      "ai_reasoning": "The codebase exhibits a systemic pattern of large, high-cyclomatic-complexity components concentrated in the UI layer, particularly in media detail pages and watch-together features. All 79 findings are performance-related (no security issues or code smells), indicating the team prioritizes correctness but has not yet refactored monolith components into smaller, composable units. The three hotspot clusters share the same root cause—overloaded React components mixing data fetching, state management, and rendering logic—which will increasingly harm maintainability and bundle performance as the application grows.",
+      "architectural_recommendations": [
+        "Extract data-fetching and state-management logic from large components (MediaInfo, FlixFormManager, WTClientPage) into custom hooks or dedicated data-layer modules, reducing component size and cyclomatic complexity.",
+        "Decompose the MediaInfo component (162+ lines) into smaller presentational sub-components (e.g., MediaHeader, MediaMetadata, MediaActions) to improve testability and reusability across the media detail page.",
+        "Standardize a component decomposition pattern across all hotspot clusters: enforce a maximum function size (e.g., &lt;100 lines) and cyclomatic complexity threshold (e.g., &lt;10) via linting rules (ESLint complexity plugin) to prevent regression.",
+        "Consolidate the duplicated watch-together page logic (WTClientPage, WTHostPage, WTPageContainer share similar patterns) into a shared composable hook or higher-order component to reduce code duplication and maintenance surface area.",
+        "Introduce code-splitting via React.lazy or dynamic imports for the heavy media detail and watch-together page components to improve initial bundle size and time-to-interactive."
+      ],
+      "refactor_suggestions": []
+    }
+  }
+}
