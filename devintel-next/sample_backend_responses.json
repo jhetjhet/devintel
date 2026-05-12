@@ -1,0 +1,83 @@
+{
+  "full_audit_report": {
+    "job_id": "AUDIT-7742-XF",
+    "repo_url": "github.com/vercel/next.js",
+    "status": "completed",
+    "timestamp": "2026-05-07T08:42:11Z",
+    "summary": {
+      "overall_score": 82,
+      "health_category": "Low Debt",
+      "verdict": "Production Ready",
+      "growth_pts": 5
+    },
+    "radar_metrics": [
+      { "subject": "Maintainability", "score": 85, "max": 100 },
+      { "subject": "Scalability", "score": 78, "max": 100 },
+      { "subject": "Security", "score": 92, "max": 100 },
+      { "subject": "Performance", "score": 70, "max": 100 },
+      { "subject": "Test Coverage", "score": 65, "max": 100 },
+      { "subject": "Architecture", "score": 88, "max": 100 }
+    ],
+    "file_structure_health": [
+      { "path": "src/app", "health_score": 95, "file_count": 12, "status": "excellent" },
+      { "path": "src/components", "health_score": 82, "file_count": 45, "status": "good" },
+      { "path": "src/services", "health_score": 45, "file_count": 8, "status": "critical" },
+      { "path": "src/lib", "health_score": 76, "file_count": 15, "status": "warning" }
+    ],
+    "quick_wins": [
+      {
+        "id": "win_1",
+        "title": "Circular Dependency",
+        "description": "/services/auth.ts references /utils/logger.ts which references /services/auth.ts",
+        "impact": "High",
+        "type": "architectural"
+      },
+      {
+        "id": "win_2",
+        "title": "Large Component Detection",
+        "description": "UserDashboard.tsx exceeds 450 lines of code. Consider breaking into sub-components.",
+        "impact": "Medium",
+        "type": "maintainability"
+      }
+    ],
+    "security_audit": {
+      "critical_count": 0,
+      "medium_count": 2,
+      "low_count": 15,
+      "vulnerabilities": [
+        {
+          "id": "vuln_1",
+          "title": "Potentially Exposed API Secret",
+          "location": "/src/config/old_config.ts:42",
+          "severity": "medium",
+          "description": "Detected a string pattern matching a high-entropy secret (potential Stripe Key).",
+          "remediation": "Move to environment variables and rotate the key immediately."
+        },
+        {
+          "id": "vuln_2",
+          "title": "Insecure Transition in Axios",
+          "location": "package.json",
+          "severity": "medium",
+          "cve": "CVE-2023-45853",
+          "description": "Outdated version of axios allows potential SSRF.",
+          "remediation": "Update to axios@1.6.0 or higher."
+        }
+      ]
+    },
+    "ai_reasoning": "The system architecture exhibits strong modularization in the UI layer but suffers from direct coupling between the Auth services and Database utilities. LangGraph agents recommend implementing a Repository Pattern to abstract data persistence."
+  },
+  "refactor_suggestion": {
+    "suggestion_id": "REF-992",
+    "title": "SRP Violation in Request Handler",
+    "reasoning": "The target function is handling auth, validation, and db operations simultaneously. We recommend decoupling the service layer.",
+    "diff": {
+      "before": "async function handleUserOperation(req: Request) {\n  const user = await db.users.find(req.id);\n  if (!user.token) throw new Error('Unauth');\n  const result = await db.orders.create(req.payload);\n  await emailService.sendReceipt(user.email, result.id);\n  return result;\n}",
+      "after": "async function handleUserOperation(req: Request) {\n  const user = await authService.authenticate(req.id);\n  const order = await orderService.createOrder(req.payload);\n  await notificationService.notifyOrderCreated(user, order);\n  return order;\n}"
+    }
+  },
+  "timeline_history": [
+    { "commit_hash": "7d4f91a", "timestamp": "2026-05-01T12:00:00Z", "score": 72, "technical_debt": 45 },
+    { "commit_hash": "8e5g02b", "timestamp": "2026-05-03T12:00:00Z", "score": 78, "technical_debt": 38 },
+    { "commit_hash": "9f6h13c", "timestamp": "2026-05-07T08:42:11Z", "score": 82, "technical_debt": 25 }
+  ]
+}

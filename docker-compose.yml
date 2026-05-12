@@ -37,6 +37,23 @@ services:
       - devintel_net
       - internal_net
 
+  devintel-next:
+    build:
+      context: ./devintel-next
+    restart: unless-stopped
+    volumes:
+      - ./devintel-next:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      devintel-api:
+        condition: service_started
+    networks:
+      - internal_net
+    environment:
+      CI: true
+
 networks:
   devintel_net:
     external: true

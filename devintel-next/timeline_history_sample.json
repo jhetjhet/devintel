@@ -1,0 +1,7 @@
+{
+  "timeline_history": [
+    { "commit_hash": "7d4f91a", "timestamp": "2026-05-01T12:00:00Z", "score": 72, "technical_debt": 45 },
+    { "commit_hash": "8e5g02b", "timestamp": "2026-05-03T12:00:00Z", "score": 78, "technical_debt": 38 },
+    { "commit_hash": "9f6h13c", "timestamp": "2026-05-07T08:42:11Z", "score": 82, "technical_debt": 25 }
+  ]
+}
