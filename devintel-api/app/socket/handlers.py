@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from app.config import settings
 from app.database import AsyncSessionLocal
-from app.models import Repository
+from app.models import Repository, AnalysisRun
 
 logger = logging.getLogger(__name__)
 
@@ -139,10 +139,28 @@ async def on_connect(sid: str, environ: dict, auth: dict | None = None):
         return False
 
     repository_id = str(repository_uuid)
+    force = (auth or {}).get("force", False)
+    commit_hash = repo.latest_commit_hash or ""
 
-    # Spawn worker container (idempotent — skips if already running)
+    # Skip worker spawn if this repo+commit was already analyzed (unless force=true)
+    if not force:
+        async with AsyncSessionLocal() as session:
+            existing = await session.execute(
+                select(AnalysisRun).where(
+                    AnalysisRun.repository_id == repository_uuid,
+                    AnalysisRun.commit_hash == commit_hash,
+                )
+            )
+            if existing.scalar_one_or_none():
+                logger.info(
+                    "Connection rejected — analysis already exists for repository %s at commit %s (sid=%s). "
+                    "Pass force=true to re-analyze.",
+                    repository_uuid, commit_hash, sid,
+                )
+                return False
+
     try:
-        await asyncio.to_thread(_ensure_container_running, repo.repo_url, repository_id, repo.latest_commit_hash or "")
+        await asyncio.to_thread(_ensure_container_running, repo.repo_url, repository_id, commit_hash)
     except Exception:
         logger.exception("Failed to spawn container for repository %s (sid=%s)", repository_id, sid)
         return False
