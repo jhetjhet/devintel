@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Repository
+from app.models import Repository, AnalysisRun
 from services.redis_service import get_analysis_result, delete_analysis_keys
 from utils.analysis_persist import persist_analysis_result
 
@@ -50,4 +50,56 @@ async def process_analysis_result(repository_id: str, db: AsyncSession) -> dict:
     return {
         "repository_id": str(repo.id),
         "commit_hash": commit_hash,
+    }
+
+
+async def get_analysis_status(repository_id: str, db: AsyncSession) -> dict:
+    """
+    Returns the analysis status for the repository's latest commit.
+
+    Possible statuses:
+    - "completed"   : AnalysisRun record exists for this repo + commit hash
+    - "in_progress" : No DB record but Redis result key is present (worker still running)
+    - "not_started" : No DB record and no Redis result key
+    """
+    try:
+        repo_uuid = uuid.UUID(repository_id)
+    except ValueError:
+        raise ValueError("Invalid repository ID format.")
+
+    result = await db.execute(select(Repository).where(Repository.id == repo_uuid))
+    repo = result.scalar_one_or_none()
+
+    if not repo:
+        raise ValueError("Repository not found.")
+
+    commit_hash = repo.latest_commit_hash or ""
+
+    # Check DB first
+    run_result = await db.execute(
+        select(AnalysisRun).where(
+            AnalysisRun.repository_id == repo_uuid,
+            AnalysisRun.commit_hash == commit_hash,
+        )
+    )
+    if run_result.scalar_one_or_none():
+        return {
+            "repository_id": repository_id,
+            "commit_hash": commit_hash,
+            "status": "completed",
+        }
+
+    # Check Redis for in-progress result
+    raw = await get_analysis_result(repository_id, commit_hash)
+    if raw is not None:
+        return {
+            "repository_id": repository_id,
+            "commit_hash": commit_hash,
+            "status": "in_progress",
+        }
+
+    return {
+        "repository_id": repository_id,
+        "commit_hash": commit_hash,
+        "status": "not_started",
     }
