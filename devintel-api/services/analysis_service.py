@@ -1,0 +1,53 @@
+import json
+import uuid
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import Repository
+from services.redis_service import get_analysis_result, delete_analysis_keys
+from utils.analysis_persist import persist_analysis_result
+
+
+async def process_analysis_result(repository_id: str, db: AsyncSession) -> dict:
+    """
+    Fetch analysis result from Redis, validate, transform, and persist to database.
+    Returns {repository_id, commit_hash} on success, or error dict on failure.
+    """
+    try:
+        repo_uuid = uuid.UUID(repository_id)
+    except ValueError:
+        raise ValueError("Invalid repository ID format.")
+
+    result = await db.execute(
+        select(Repository).where(Repository.id == repo_uuid)
+    )
+    repo = result.scalar_one_or_none()
+
+    if not repo:
+        raise ValueError("Repository not found.")
+
+    commit_hash = repo.latest_commit_hash
+
+    raw = await get_analysis_result(repository_id, commit_hash)
+
+    if raw is None:
+        raise ValueError("No result found for this repository.")
+
+    data = json.loads(raw)
+
+    # Return error results immediately without any DB writes
+    if data.get("status") == "error":
+        return data
+
+    # The agent wraps the report under "full_audit_report"
+    report = data.get("full_audit_report", data)
+    await persist_analysis_result(db, repo, report)
+
+    # Delete all Redis keys for this repo+commit to prevent stale data
+    await delete_analysis_keys(repository_id, commit_hash)
+
+    return {
+        "repository_id": str(repo.id),
+        "commit_hash": commit_hash,
+    }

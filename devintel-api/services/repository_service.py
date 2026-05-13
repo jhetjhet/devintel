@@ -1,0 +1,84 @@
+from urllib.parse import urlparse
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import Repository
+from schemas.repository import RepositoryResponse
+from utils.repo_meta import get_repo_metadata
+
+
+async def analyze_repository(request_url: str, db: AsyncSession) -> RepositoryResponse:
+    """Fetch repository metadata and create/update repository record."""
+    result = await db.execute(
+        select(Repository).where(Repository.repo_url == request_url)
+    )
+    repo = result.scalar_one_or_none()
+
+    repo_meta = get_repo_metadata(request_url)
+
+    print(f"Fetched metadata for {request_url}:")
+    print(f"  Title: {repo_meta.title}")
+    print(f"  Latest commit: {repo_meta.latest_commit_hash} - {repo_meta.latest_commit_message}")
+    print(f"  Author: {repo_meta.latest_commit_author} <{repo_meta.latest_commit_author_email}> on {repo_meta.latest_commit_date}")
+    print(f"  Default branch: {repo_meta.default_branch}")
+    print(f"  Provider/owner/repo: {repo_meta.url} -> {repo_meta.url.split('/')[-2:]}")
+    print(f"  Parsed URL: {urlparse(request_url)}")
+
+    parsed = urlparse(request_url)
+    netloc = parsed.netloc or ""
+    provider = netloc.split(".")[0] if netloc else None
+    path_parts = parsed.path.strip("/").split("/")
+    owner_name = path_parts[0] if len(path_parts) >= 1 else None
+
+    if not repo:
+        repo = Repository(
+            repo_url=request_url,
+            provider=provider,
+            owner_name=owner_name,
+            repo_name=repo_meta.title,
+            latest_commit_hash=repo_meta.latest_commit_hash,
+        )
+        db.add(repo)
+        await db.commit()
+        await db.refresh(repo)
+    else:
+        repo.latest_commit_hash = repo_meta.latest_commit_hash
+        await db.commit()
+        await db.refresh(repo)
+
+    print(repo.id)
+
+    return RepositoryResponse(
+        id=str(repo.id),
+        repo_url=repo.repo_url,
+        provider=repo.provider,
+        owner_name=repo.owner_name,
+        repo_name=repo.repo_name,
+    )
+
+
+async def get_repository_by_id(repository_id: str, db: AsyncSession) -> RepositoryResponse:
+    """Fetch repository by ID."""
+    import uuid
+
+    try:
+        repo_uuid = uuid.UUID(repository_id)
+    except ValueError:
+        raise ValueError("Invalid repository ID format.")
+
+    result = await db.execute(
+        select(Repository).where(Repository.id == repo_uuid)
+    )
+    repo = result.scalar_one_or_none()
+
+    if not repo:
+        raise ValueError("Repository not found.")
+
+    return RepositoryResponse(
+        id=str(repo.id),
+        repo_url=repo.repo_url,
+        provider=repo.provider,
+        owner_name=repo.owner_name,
+        repo_name=repo.repo_name,
+    )
