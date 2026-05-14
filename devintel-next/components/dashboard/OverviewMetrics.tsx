@@ -1,13 +1,34 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
-import { FullAuditReport } from '@/types/schemas';
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  ResponsiveContainer,
+} from "recharts";
+import { RadarMetric } from "@/types/repository";
 
-interface OverviewMetricsProps {
-  report: FullAuditReport;
-  radarData: Array<{ subject: string, A: number, fullMark: number }>;
-}
+type OverviewMetricsProps = {
+  overall_score: number | null;
+  technical_debt_score: number | null;
+  confidence: number | null;
+  total_findings: number | null;
+  radar_metrics: RadarMetric[];
+};
 
-export function OverviewMetrics({ report, radarData }: OverviewMetricsProps) {
+export function OverviewMetrics({
+  overall_score,
+  technical_debt_score,
+  confidence,
+  total_findings,
+  radar_metrics,
+}: OverviewMetricsProps) {
+  const radarData = radar_metrics.map((m) => ({
+    subject: m.subject,
+    A: m.score,
+    fullMark: m.max,
+  }));
+
   return (
     <>
       <Card className="bg-surface border-white/5 relative overflow-hidden group">
@@ -32,25 +53,46 @@ export function OverviewMetrics({ report, radarData }: OverviewMetricsProps) {
                 stroke="currentColor"
                 strokeWidth="8"
                 strokeDasharray={440}
-                strokeDashoffset={440 - (440 * report.llm_insights.overall_score) / 100}
+                strokeDashoffset={440 - (440 * (overall_score ?? 0)) / 100}
                 strokeLinecap="round"
                 className="text-primary glow-primary"
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black text-white">{report.llm_insights.overall_score}</span>
-              <span className="text-[10px] text-white/40 uppercase font-mono tracking-widest">Health</span>
+              <span className="text-4xl font-black text-white">
+                {overall_score ?? "—"}
+              </span>
+              <span className="text-[10px] text-white/40 uppercase font-mono tracking-widest">
+                Health
+              </span>
             </div>
           </div>
           <div className="mt-6 flex gap-4 text-center">
             <div>
-              <div className="text-xs text-secondary font-bold">+{report.llm_insights.growth_pts} pts</div>
-              <div className="text-[10px] text-white/40 uppercase font-mono">Growth Pts</div>
+              <div className="text-xs text-warning font-bold">
+                {technical_debt_score ?? "—"}
+              </div>
+              <div className="text-[10px] text-white/40 uppercase font-mono">
+                Tech Debt
+              </div>
             </div>
             <div className="w-[1px] bg-white/10" />
             <div>
-              <div className="text-xs text-warning font-bold">{report.llm_insights.overall_verdict}</div>
-              <div className="text-[10px] text-white/40 uppercase font-mono">Verdict</div>
+              <div className="text-xs text-primary font-bold">
+                {total_findings ?? "—"}
+              </div>
+              <div className="text-[10px] text-white/40 uppercase font-mono">
+                Findings
+              </div>
+            </div>
+            <div className="w-[1px] bg-white/10" />
+            <div>
+              <div className="text-xs text-secondary font-bold">
+                {confidence !== null ? `${Math.round(confidence * 100)}%` : "—"}
+              </div>
+              <div className="text-[10px] text-white/40 uppercase font-mono">
+                Confidence
+              </div>
             </div>
           </div>
         </CardContent>
@@ -61,7 +103,10 @@ export function OverviewMetrics({ report, radarData }: OverviewMetricsProps) {
           <ResponsiveContainer width="100%" height={250}>
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
               <PolarGrid stroke="var(--border)" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--foreground)', opacity: 0.4, fontSize: 10 }} />
+              <PolarAngleAxis
+                dataKey="subject"
+                tick={{ fill: "var(--foreground)", opacity: 0.4, fontSize: 10 }}
+              />
               <Radar
                 name="Intelligence"
                 dataKey="A"
