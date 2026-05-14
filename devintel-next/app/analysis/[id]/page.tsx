@@ -1,6 +1,6 @@
 import { Analysis } from '@/components/Analysis';
-import { AnalysisInProgress } from '@/components/AnalysisInProgress';
 import { AnalysisCompleted } from '@/components/AnalysisCompleted';
+import { AnalysisInPending } from '@/components/AnalysisInPending';
 import { AnalysisStatusResponse, AnalysisStatusResponseSchema } from '@/types/api';
 
 type AnalysisPageProps = {
@@ -39,13 +39,13 @@ export default async function AnalysisPage({ params, searchParams }: AnalysisPag
 
   console.log("Analysis status:", isForceRefresh, analysisStatus);
 
-  if (analysisStatus.status === "with_result" && !isForceRefresh) {
-    return <AnalysisInProgress repositoryId={id} commitHash={analysisStatus.commit_hash} />;
+  if (analysisStatus.has_pending_result && !isForceRefresh) {
+    return <AnalysisInPending repositoryId={id} commitHash={analysisStatus.commit_hash} />;
   }
 
-  if (analysisStatus.status === "completed") {
-    return <AnalysisCompleted repositoryId={id} commitHash={analysisStatus.commit_hash} />;
+  if (analysisStatus.recent_analysis_run && !isForceRefresh) {
+    return <AnalysisCompleted repositoryId={id} commitHash={analysisStatus.commit_hash} analysisRunId={analysisStatus.recent_analysis_run.id} />;
   }
 
-  return <Analysis repositoryId={id} />;
+  return <Analysis repositoryId={id} force={isForceRefresh} />;
 }

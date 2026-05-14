@@ -6,12 +6,12 @@ type DashboardPageProps = {
     id: string;
   };
   searchParams: {
-    commit_hash?: string;
+    analysis_run_id?: string;
   };
 };
 
-async function fetchReportData(repositoryId: string, commitHash: string): Promise<AnalysisRunDetail> {
-  const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}/reports/${commitHash}`);
+async function fetchReportData(repositoryId: string, analysisRunId: string): Promise<AnalysisRunDetail> {
+  const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}/reports/${analysisRunId}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch report data");
@@ -29,26 +29,9 @@ async function fetchReportData(repositoryId: string, commitHash: string): Promis
 
 export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const { id } = await params;
-  const { commit_hash } = await searchParams;
+  const { analysis_run_id } = await searchParams;
 
-
-  const reportData = await fetchReportData(id, commit_hash || "latest");
-  
-
-  // const response = await fetch(
-  //   `http://devintel-api:8000/api/analyze/complete/${id}`,
-  //   {
-  //     method: "POST",
-  //   },
-  // );
-
-  // if (!response.ok) {
-  //   console.error("Failed to complete analysis:", response.statusText);
-  //   return <div>Error loading dashboard</div>;
-  // }
-
-  // const data = await response.json();
-  // console.log("Analysis completed successfully:", data);
+  const reportData = await fetchReportData(id, analysis_run_id || "latest");
 
   return (
     <Dashboard analysisDetails={reportData} />

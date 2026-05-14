@@ -12,7 +12,7 @@ interface AnalysisInProgressProps {
   commitHash: string;
 }
 
-export function AnalysisInProgress({
+export function AnalysisInPending({
   repositoryId,
   commitHash,
 }: AnalysisInProgressProps) {
@@ -29,7 +29,7 @@ export function AnalysisInProgress({
       if (!response.success) {
         setError(response.error.message);
       } else {
-        router.push(`/dashboard/${response.data.repository_id}?commit_hash=${response.data.commit_hash}`);
+        router.push(`/dashboard/${response.data.repository_id}?analysis_run_id=${response.data.analysis_run_id}`);
       }
     });
   };
