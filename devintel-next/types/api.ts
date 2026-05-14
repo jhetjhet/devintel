@@ -35,14 +35,38 @@ export const AuditProgressSchema = z.object({
     progress_stage: z.string().optional(),
 });
 
+const AnalysisRunSummarySchema = z.object({
+  id: z.string(),
+  job_id: z.string(),
+  commit_hash: z.string().nullable(),
+  branch: z.string().nullable(),
+  repo_name: z.string().nullable(),
+  overall_score: z.number().nullable(),
+  technical_debt_score: z.number().nullable(),
+  overall_verdict: z.string().nullable(),
+  confidence: z.number().nullable(),
+  total_findings: z.number().nullable(),
+  total_smells: z.number().nullable(),
+  security_critical_count: z.number().nullable(),
+  security_high_count: z.number().nullable(),
+  security_medium_count: z.number().nullable(),
+  security_low_count: z.number().nullable(),
+  scanned_at: z.string().nullable(),
+  created_at: z.string(),
+});
+
 export const AnalysisStatusResponseSchema = z.object({
   repository_id: z.string(),
   commit_hash: z.string(),
-  status: z.enum(["completed", "with_result", "in_progress", "not_started"]),
+  recent_analysis_run: AnalysisRunSummarySchema.nullable(),
+  analysis_run_count: z.number(),
+  has_pending_result: z.boolean(),
+  analysis_status: z.string().nullable(),
 });
 
 export const AnalaysisCompleteResponseSchema = z.object({
   repository_id: z.string(),
+  analysis_run_id: z.string(),
   commit_hash: z.string(),
 });
 
@@ -70,4 +94,5 @@ export type FastApiError = z.infer<typeof FastApiErrorSchema>;
 export type Repository = z.infer<typeof RepositorySchema>;
 export type AuditProgress = z.infer<typeof AuditProgressSchema>;
 export type AnalysisStatusResponse = z.infer<typeof AnalysisStatusResponseSchema>;
+export type AnalysisRunSummary = z.infer<typeof AnalysisRunSummarySchema>;
 export type AnalysisCompleteResponse = z.infer<typeof AnalaysisCompleteResponseSchema>;

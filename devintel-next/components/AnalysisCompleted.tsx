@@ -8,11 +8,13 @@ import Link from "next/link";
 type AnalysisCompletedProps = {
   repositoryId: string;
   commitHash: string;
+  analysisRunId?: string;
 };
 
 export function AnalysisCompleted({
   repositoryId,
   commitHash,
+  analysisRunId,
 }: AnalysisCompletedProps) {
   const router = useRouter();
 
@@ -94,7 +96,7 @@ export function AnalysisCompleted({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() =>
-              router.push(`/dashboard/${repositoryId}?commit_hash=${commitHash}`)
+              router.push(`/dashboard/${repositoryId}?analysis_run_id=${analysisRunId}`)
             }
             className="flex items-center justify-center gap-2 px-5 py-3 bg-secondary hover:bg-secondary/90 text-black font-bold text-sm rounded-xl transition-all duration-200"
           >
@@ -103,11 +105,11 @@ export function AnalysisCompleted({
           </button>
 
           <button
-            onClick={() => router.push(`/analysis/${repositoryId}`)}
+            onClick={() => router.push(`/analysis/${repositoryId}?force=true`)}
             className="flex items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors"
           >
             <RotateCw size={16} />
-            Run Again
+            Run New Analysis
           </button>
         </div>
 

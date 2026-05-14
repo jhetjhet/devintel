@@ -12,9 +12,10 @@ import { useRouter } from 'next/navigation';
 
 interface AnalysisProps {
   repositoryId: string;
+  force?: boolean;
 }
 
-export function Analysis({ repositoryId }: AnalysisProps) {
+export function Analysis({ repositoryId, force = false }: AnalysisProps) {
   const router = useRouter();
 
   const [logs, setLogs] = useState<string[]>([]);
@@ -56,6 +57,7 @@ export function Analysis({ repositoryId }: AnalysisProps) {
     const socket = io("ws://localhost:8000", {
       auth: {
         repository_id: repository?.id,
+        force: force,
       },
       path: "/socket.io",
       withCredentials: true,
@@ -89,7 +91,7 @@ export function Analysis({ repositoryId }: AnalysisProps) {
         if (!response.success) {
           setLogs((prevLogs) => [...prevLogs, `Error finalizing analysis: ${response.error.message}`]);
         } else {
-          router.push(`/dashboard/${response.data.repository_id}?commit_hash=${response.data.commit_hash}`);
+          router.push(`/dashboard/${response.data.repository_id}?analysis_run_id=${response.data.analysis_run_id}`);
         }
       });
     });
