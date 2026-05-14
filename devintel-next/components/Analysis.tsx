@@ -1,25 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { motion } from 'motion/react';
 import { Terminal, BrainCircuit, Activity } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { io } from "socket.io-client";
 import { AuditProgress, Repository, RepositorySchema } from '@/types/api';
+import { finalizeAnalysis } from '@/app/actions/evaluate';
+import { useRouter } from 'next/navigation';
 
 interface AnalysisProps {
   repositoryId: string;
 }
 
 export function Analysis({ repositoryId }: AnalysisProps) {
+  const router = useRouter();
+
   const [logs, setLogs] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [repository, setRepository] = useState<Repository | null>(null);
 
+  const [, startFinalizeAnalysisTransition] = useTransition();
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
-
 
   useEffect(() => {
     async function fetchRepository() {
@@ -60,7 +65,10 @@ export function Analysis({ repositoryId }: AnalysisProps) {
 
     socket.on("connect", () => {
       console.log("Connected to analysis socket");
-      socket.emit("join_room", repositoryId);
+    });
+
+    socket.on("initial_progress", ({ progress }: { progress: number }) => {
+      setProgress(progress);
     });
 
     socket.on("progress", (data: AuditProgress) => {
@@ -72,6 +80,18 @@ export function Analysis({ repositoryId }: AnalysisProps) {
 
     socket.on("done", (data: any) => {
       console.log("Analysis complete:", data);
+
+      setLogs((prevLogs) => [...prevLogs, "Analysis complete. Finalizing results..."]);
+
+      startFinalizeAnalysisTransition(async () => {
+        const response = await finalizeAnalysis(repositoryId);
+  
+        if (!response.success) {
+          setLogs((prevLogs) => [...prevLogs, `Error finalizing analysis: ${response.error.message}`]);
+        } else {
+          router.push(`/dashboard/${response.data.repository_id}?commit_hash=${response.data.commit_hash}`);
+        }
+      });
     });
 
     socket.on("error", (data: any) => {

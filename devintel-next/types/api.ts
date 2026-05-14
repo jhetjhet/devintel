@@ -35,6 +35,17 @@ export const AuditProgressSchema = z.object({
     progress_stage: z.string().optional(),
 });
 
+export const AnalysisStatusResponseSchema = z.object({
+  repository_id: z.string(),
+  commit_hash: z.string(),
+  status: z.enum(["completed", "with_result", "in_progress", "not_started"]),
+});
+
+export const AnalaysisCompleteResponseSchema = z.object({
+  repository_id: z.string(),
+  commit_hash: z.string(),
+});
+
 export type AppFieldError = {
   field: Record<string, string[]>;
   messages: string[];
@@ -58,3 +69,5 @@ export type FetchResponse<T> = {
 export type FastApiError = z.infer<typeof FastApiErrorSchema>;
 export type Repository = z.infer<typeof RepositorySchema>;
 export type AuditProgress = z.infer<typeof AuditProgressSchema>;
+export type AnalysisStatusResponse = z.infer<typeof AnalysisStatusResponseSchema>;
+export type AnalysisCompleteResponse = z.infer<typeof AnalaysisCompleteResponseSchema>;
