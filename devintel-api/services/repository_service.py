@@ -15,7 +15,11 @@ async def analyze_repository(request_url: str, db: AsyncSession) -> RepositoryRe
     )
     repo = result.scalar_one_or_none()
 
-    repo_meta = get_repo_metadata(request_url)
+    try:
+        repo_meta = get_repo_metadata(request_url)
+    except Exception as e:
+        print(f"Error fetching metadata for {request_url}: {e}")
+        raise ValueError("Failed to fetch repository metadata. Please check the URL and make sure target repository is public.")
 
     print(f"Fetched metadata for {request_url}:")
     print(f"  Title: {repo_meta.title}")
