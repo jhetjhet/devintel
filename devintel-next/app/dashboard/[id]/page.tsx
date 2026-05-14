@@ -34,6 +34,9 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const reportData = await fetchReportData(id, analysis_run_id || "latest");
 
   return (
-    <Dashboard analysisDetails={reportData} />
+    <Dashboard 
+      analysisDetails={reportData} 
+      repositoryId={id}
+    />
   );
 }

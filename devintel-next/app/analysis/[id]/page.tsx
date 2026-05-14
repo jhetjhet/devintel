@@ -1,7 +1,7 @@
 import { Analysis } from '@/components/Analysis';
 import { AnalysisCompleted } from '@/components/AnalysisCompleted';
 import { AnalysisInPending } from '@/components/AnalysisInPending';
-import { AnalysisStatusResponse, AnalysisStatusResponseSchema } from '@/types/api';
+import { AnalysisStatusResponse, AnalysisStatusResponseSchema } from '@/types/repository';
 
 type AnalysisPageProps = {
   params: {

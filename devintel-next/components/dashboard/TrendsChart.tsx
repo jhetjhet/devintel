@@ -10,7 +10,7 @@ interface TrendsChartProps {
 
 export function TrendsChart({ trendData, activeMetric, setActiveMetric }: TrendsChartProps) {
   return (
-    <Card className="bg-surface border-white/5 col-span-1 md:col-span-3 lg:col-span-4">
+    <Card className="bg-surface border-white/5 col-span-1 md:col-span-2 lg:col-span-3">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-white/60 text-sm font-mono uppercase tracking-widest">Growth Metrics</CardTitle>

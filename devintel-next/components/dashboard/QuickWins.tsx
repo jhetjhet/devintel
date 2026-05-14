@@ -9,7 +9,7 @@ interface QuickWinsProps {
 
 export function QuickWins({ quick_wins }: QuickWinsProps) {
   return (
-    <Card className="bg-surface border-white/5 col-span-1 md:col-span-1 lg:col-span-2">
+    <Card className="bg-surface border-white/5 col-span-1 md:col-span-1 lg:col-span-1">
       <CardHeader>
         <CardTitle className="text-white/60 text-sm font-mono uppercase tracking-widest">
           Quick Wins & Insights
