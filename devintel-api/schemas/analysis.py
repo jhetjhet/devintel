@@ -16,13 +16,21 @@ from .report import (
 
 class AnalysisRunSummary(BaseModel):
     id: str
+    repository_id: str | None
     job_id: str
     commit_hash: str | None
     branch: str | None
     repo_name: str | None
+    languages: list | None
+    frameworks: list | None
+    file_count: int | None
+    detected_pattern: str | None
     overall_score: int | None
     technical_debt_score: int | None
     overall_verdict: str | None
+    confidence: float | None
+    growth_pts: int | None
+    ai_reasoning: str | None
     total_findings: int | None
     total_smells: int | None
     security_critical_count: int | None

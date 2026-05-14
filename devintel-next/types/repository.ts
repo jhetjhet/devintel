@@ -141,6 +141,26 @@ export const AnalysisRunSummarySchema = AnalysisRunBaseSchema.merge(
   .merge(SecurityCountsSchema)
   .merge(FindingSummarySchema);
 
+export const PartialAnalysisRunSummarySchema =
+  AnalysisRunSummarySchema.partial().required({
+    id: true,
+    job_id: true,
+    commit_hash: true,
+    branch: true,
+    repo_name: true,
+    overall_score: true,
+    technical_debt_score: true,
+    overall_verdict: true,
+    total_findings: true,
+    total_smells: true,
+    security_critical_count: true,
+    security_high_count: true,
+    security_medium_count: true,
+    security_low_count: true,
+    scanned_at: true,
+    created_at: true,
+  });
+
 export const AnalysisRunDetailSchema = AnalysisRunSummarySchema.merge(
   z.object({
     radar_metrics: z.array(RadarMetricSchema),
@@ -153,6 +173,15 @@ export const AnalysisRunDetailSchema = AnalysisRunSummarySchema.merge(
     dependencies: z.array(AnalysisDependencySchema),
   }),
 );
+
+export const AnalysisStatusResponseSchema = z.object({
+  repository_id: z.string(),
+  commit_hash: z.string(),
+  recent_analysis_run: PartialAnalysisRunSummarySchema.nullable(),
+  analysis_run_count: z.number(),
+  has_pending_result: z.boolean(),
+  analysis_status: z.string().nullable(),
+});
 
 // ---------------------------------------------------------------------------
 // Inferred types
@@ -167,6 +196,10 @@ export type QuickWin = z.infer<typeof QuickWinSchema>;
 export type SecurityVulnerability = z.infer<typeof SecurityVulnerabilitySchema>;
 export type RiskyEntity = z.infer<typeof RiskyEntitySchema>;
 export type FileHealthEntry = z.infer<typeof FileHealthEntrySchema>;
+export type PartialAnalysisRunSummary = z.infer<typeof PartialAnalysisRunSummarySchema>;
 export type AnalysisDependency = z.infer<typeof AnalysisDependencySchema>;
 export type AnalysisRunSummary = z.infer<typeof AnalysisRunSummarySchema>;
 export type AnalysisRunDetail = z.infer<typeof AnalysisRunDetailSchema>;
+export type AnalysisStatusResponse = z.infer<
+  typeof AnalysisStatusResponseSchema
+>;

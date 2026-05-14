@@ -8,14 +8,74 @@ import { QuickWins } from "./dashboard/QuickWins";
 import { FileStructure } from "./dashboard/FileStructure";
 import { SecurityAudit } from "./dashboard/SecurityAudit";
 import { RefactorLab } from "./dashboard/RefactorLab";
-import { AnalysisRunDetail } from "@/types/repository";
+import { AuditHistory } from "./dashboard/AuditHistory";
+import { TrendsChart } from "./dashboard/TrendsChart";
+import { RiskyEntitiesChart } from "./dashboard/RiskyEntitiesChart";
+import { DependenciesHealth } from "./dashboard/DependenciesHealth";
+import { LanguageFrameworkDistribution } from "./dashboard/LanguageFrameworkDistribution";
+import { SecurityEvolution } from "./dashboard/SecurityEvolution";
+import { FindingsSmellsTrend } from "./dashboard/FindingsSmellsTrend";
+import { AnalysisRunDetail, AnalysisRunSummary, AnalysisRunSummarySchema } from "@/types/repository";
+import useSWR from "swr";
+
+async function fetchReporsts(repositoryId: string): Promise<AnalysisRunSummary[]> {
+  try {
+    const response = await fetch(`http://localhost:8000/api/repositories/${repositoryId}/reports/`);
+
+    if (!response.ok) {
+      console.error("Failed to fetch reports:", await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+
+    console.log("Raw reports data:", data);
+
+    const dataRes = AnalysisRunSummarySchema.array().safeParse(data);
+
+    if (!dataRes.success) {
+      console.error("Invalid reports data format:", dataRes.error);
+      return [];
+    }
+
+    return dataRes.data;
+  } catch (error) {
+    console.error("Failed to fetch reports:", error);
+    return [];
+  }
+}
 
 type DashboardProps = {
+  repositoryId: string;
   analysisDetails: AnalysisRunDetail;
 };
 
-export function Dashboard({ analysisDetails }: DashboardProps) {
+export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
   const [selectedRefactor, setSelectedRefactor] = useState(0);
+  const [activeMetric, setActiveMetric] = useState<"debt" | "score">("score");
+
+  const {
+    data: reportHistory,
+    error: reportHistoryError,
+    isLoading: reportHistoryLoading,
+  } = useSWR(`repository-${repositoryId}-reports`, () => fetchReporsts(repositoryId));
+
+  const trendData = (reportHistory ?? [])
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(a.scanned_at ?? a.created_at).getTime() -
+        new Date(b.scanned_at ?? b.created_at).getTime(),
+    )
+    .slice(-12)
+    .map((run) => {
+      const d = new Date(run.scanned_at ?? run.created_at);
+      return {
+        day:   `${d.getMonth() + 1}/${d.getDate()}`,
+        debt:  run.technical_debt_score ?? 0,
+        score: run.overall_score        ?? 0,
+      };
+    });
 
   const currentRefactor = analysisDetails.refactor_suggestions[selectedRefactor];
   const refactorDiff = currentRefactor
@@ -48,7 +108,38 @@ export function Dashboard({ analysisDetails }: DashboardProps) {
             radar_metrics={analysisDetails.radar_metrics}
           />
 
+          
+        </div>
+
+        {/* Score & Debt over time */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          <TrendsChart
+            trendData={trendData}
+            activeMetric={activeMetric}
+            setActiveMetric={setActiveMetric}
+          />
+
           <QuickWins quick_wins={analysisDetails.quick_wins} />
+        </div>
+
+        {/* Risky entities + Dependencies */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          <RiskyEntitiesChart entities={analysisDetails.risky_entities} />
+          <DependenciesHealth dependencies={analysisDetails.dependencies} />
+        </div>
+
+        {/* Tech stack + Security evolution */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          <LanguageFrameworkDistribution
+            languages={analysisDetails.languages}
+            frameworks={analysisDetails.frameworks}
+          />
+          <SecurityEvolution runs={reportHistory ?? []} />
+        </div>
+
+        {/* Findings & smells over time */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          <FindingsSmellsTrend runs={reportHistory ?? []} />
         </div>
 
         <Tabs defaultValue="structure" className="w-full">
@@ -114,6 +205,13 @@ export function Dashboard({ analysisDetails }: DashboardProps) {
             )}
           </TabsContent>
         </Tabs>
+
+        <div className="mt-12">
+          <AuditHistory
+            runs={reportHistory ?? []}
+            isLoading={reportHistoryLoading}
+          />
+        </div>
       </div>
     </div>
   );
