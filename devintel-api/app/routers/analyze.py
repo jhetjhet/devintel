@@ -6,7 +6,7 @@ from schemas.repository import AnalyzeRequest, RepositoryResponse
 from schemas.analysis import AnalysisRunSummary, AnalysisRunDetail
 from services.repository_service import analyze_repository, get_repository_by_id
 from services.analysis_service import process_analysis_result, get_analysis_status
-from services.report_service import list_analysis_runs, get_analysis_run_detail
+from services.report_service import list_analysis_runs, get_analysis_run_detail, get_analysis_run_detail_by_id
 
 router = APIRouter()
 
@@ -50,10 +50,10 @@ async def list_reports(repository_id: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/api/repositories/{repository_id}/reports/{commit_hash}/", response_model=AnalysisRunDetail)
-async def get_report(repository_id: str, commit_hash: str, db: AsyncSession = Depends(get_db)):
+@router.get("/api/repositories/{repository_id}/reports/{analysis_run_id}/", response_model=AnalysisRunDetail)
+async def get_report(repository_id: str, analysis_run_id: str, db: AsyncSession = Depends(get_db)):
     try:
-        return await get_analysis_run_detail(repository_id, commit_hash, db)
+        return await get_analysis_run_detail_by_id(repository_id, analysis_run_id, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
