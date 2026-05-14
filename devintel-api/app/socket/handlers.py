@@ -169,6 +169,19 @@ async def on_connect(sid: str, environ: dict, auth: dict | None = None):
     task = asyncio.create_task(_redis_subscriber(sid, repository_id))
     _active_tasks[sid] = task
 
+    # Emit current progress value so the client can resume from where it left off
+    try:
+        _r = aioredis.from_url(settings.REDIS_URL)
+        try:
+            raw_progress = await _r.get(f"devintel:{repository_id}:{commit_hash}:progress")
+            progress_value = int(raw_progress) if raw_progress is not None else 0
+        finally:
+            await _r.aclose()
+        await sio.emit("initial_progress", {"progress": progress_value}, to=sid)
+    except Exception:
+        logger.exception("Failed to emit initial_progress for sid=%s", sid)
+        await sio.emit("initial_progress", {"progress": 0}, to=sid)
+
     logger.info("Client sid=%s connected for repository %s", sid, repository_id)
 
 

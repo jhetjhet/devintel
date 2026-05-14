@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Repository, AnalysisRun
-from services.redis_service import get_analysis_result, delete_analysis_keys
+from services.redis_service import get_analysis_result, get_analysis_status_key, delete_analysis_keys
 from utils.analysis_persist import persist_analysis_result
 
 
@@ -89,14 +89,24 @@ async def get_analysis_status(repository_id: str, db: AsyncSession) -> dict:
             "status": "completed",
         }
 
-    # Check Redis for in-progress result
-    raw = await get_analysis_result(repository_id, commit_hash)
-    if raw is not None:
+    # Check Redis status key
+    redis_status = await get_analysis_status_key(repository_id, commit_hash)
+
+    if redis_status == "progress":
         return {
             "repository_id": repository_id,
             "commit_hash": commit_hash,
             "status": "in_progress",
         }
+
+    if redis_status == "completed":
+        raw = await get_analysis_result(repository_id, commit_hash)
+        if raw is not None:
+            return {
+                "repository_id": repository_id,
+                "commit_hash": commit_hash,
+                "status": "with_result",
+            }
 
     return {
         "repository_id": repository_id,

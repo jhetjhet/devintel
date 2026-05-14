@@ -12,6 +12,16 @@ async def get_analysis_result(repository_id: str, commit_hash: str) -> bytes | N
         await r.aclose()
 
 
+async def get_analysis_status_key(repository_id: str, commit_hash: str) -> str | None:
+    """Fetch the analysis status value from Redis ('progress' or 'complete')."""
+    r = aioredis.from_url(settings.REDIS_URL)
+    try:
+        value = await r.get(f"devintel:{repository_id}:{commit_hash}:status")
+        return value.decode() if value is not None else None
+    finally:
+        await r.aclose()
+
+
 async def delete_analysis_keys(repository_id: str, commit_hash: str) -> None:
     """Delete all Redis keys for a given repo+commit to prevent stale data."""
     r = aioredis.from_url(settings.REDIS_URL)
