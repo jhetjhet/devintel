@@ -1,6 +1,7 @@
 "use client";
 
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Plus } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type HeaderProps = {
@@ -52,6 +53,13 @@ export function Header({
       </div>
 
       <div className="flex items-center gap-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-white/50 hover:text-primary text-xs font-mono font-bold uppercase tracking-widest transition-all"
+        >
+          <Plus size={12} />
+          Run New Audit
+        </Link>
         {overall_verdict && (
           <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-bold uppercase">
             {overall_verdict}

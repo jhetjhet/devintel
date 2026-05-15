@@ -23,13 +23,6 @@ export function RefactorLab({ diff }: RefactorLabProps) {
             </CardTitle>
             <CardDescription className="text-xs mt-1 text-white/30">{diff.header}</CardDescription>
           </div>
-          <div className="flex gap-2">
-            <button className="p-2 border border-white/5 rounded-lg text-white/40 hover:text-white transition-colors"><Share2 size={16} /></button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary-hover transition-colors">
-              <PlayCircle size={16} />
-              Apply Logic
-            </button>
-          </div>
         </div>
       </CardHeader>
       <CardContent className="p-0">
