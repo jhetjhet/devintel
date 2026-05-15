@@ -77,7 +77,7 @@ export default function HomeContent() {
           <button
             type="submit"
             disabled={analyzeRepoPending}
-            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group active:scale-[0.98]"
+            className="w-full bg-primary cursor-pointer hover:bg-primary-hover text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-primary/50 disabled:text-white/50"
           >
             {analyzeRepoPending ? "Analyzing..." : "Analyze Repository"}
             <ArrowRight
@@ -89,7 +89,7 @@ export default function HomeContent() {
 
         <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.2em] flex items-center gap-3">
           <Terminal size={12} />
-          Trusted by internal architecture guilds
+          LLM-assisted · debt, risk &amp; growth signals per commit
         </p>
       </div>
 

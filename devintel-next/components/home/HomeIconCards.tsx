@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Search, Terminal, ArrowRight, Activity, Shield, BrainCircuit } from 'lucide-react';
+import { Search, Activity, Shield, BrainCircuit } from 'lucide-react';
 
 export default function HomeIconCards() {
   return [
