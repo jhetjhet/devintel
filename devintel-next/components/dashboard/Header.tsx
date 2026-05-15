@@ -35,7 +35,7 @@ export function Header({
       <div>
         <h1 className="text-3xl font-black text-white flex items-center gap-3">
           <LayoutDashboard className="text-primary" />
-          Repo Intelligence
+          Dev. Intelligence
         </h1>
         <p className="text-white/40 mt-1">
           Repo: <span className="text-primary">{repo_name ?? "—"}</span> •{" "}
