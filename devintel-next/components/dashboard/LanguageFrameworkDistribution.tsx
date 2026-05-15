@@ -52,7 +52,7 @@ export function LanguageFrameworkDistribution({
           <Code size={16} className="text-secondary" />
           Tech Stack
         </CardTitle>
-        <CardDescription className="text-[10px] text-white/30 italic">
+        <CardDescription className="text-[12px] text-white/30 italic">
           Languages and frameworks detected
         </CardDescription>
       </CardHeader>
@@ -106,7 +106,7 @@ export function LanguageFrameworkDistribution({
                     {item.name}
                   </span>
                   <span
-                    className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                    className="text-[12px] font-mono px-1.5 py-0.5 rounded"
                     style={{
                       color: langSet.has(item.name)
                         ? "rgba(56,189,248,0.8)"

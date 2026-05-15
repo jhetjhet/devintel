@@ -45,7 +45,7 @@ export function DependenciesHealth({ dependencies }: DependenciesHealthProps) {
           <Package size={16} className="text-primary" />
           Dependencies Health
         </CardTitle>
-        <CardDescription className="text-[10px] text-white/30 italic">
+        <CardDescription className="text-[12px] text-white/30 italic">
           {dependencies.length} total dependencies
         </CardDescription>
       </CardHeader>
@@ -96,12 +96,12 @@ export function DependenciesHealth({ dependencies }: DependenciesHealthProps) {
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: fill }} />
                     <span className="text-white/50 text-xs font-mono flex-1">{label}</span>
                     <span className="text-white/80 text-xs font-mono font-bold">{count}</span>
-                    <span className="text-white/30 text-[10px] font-mono w-8 text-right">{pct}%</span>
+                    <span className="text-white/30 text-[12px] font-mono w-8 text-right">{pct}%</span>
                   </div>
                 );
               })}
               <div className="border-t border-white/5 pt-2 mt-1">
-                <span className="text-white/30 text-[10px] font-mono">
+                <span className="text-white/30 text-[12px] font-mono">
                   {outdatedCount + unusedCount} need attention
                 </span>
               </div>

@@ -48,7 +48,7 @@ export function FindingsSmellsTrend({ runs }: FindingsSmellsTrendProps) {
           <Bug size={16} className="text-warning" />
           Findings &amp; Smells Trend
         </CardTitle>
-        <CardDescription className="text-[10px] text-white/30 italic">
+        <CardDescription className="text-[12px] text-white/30 italic">
           Code issues detected over time
         </CardDescription>
       </CardHeader>

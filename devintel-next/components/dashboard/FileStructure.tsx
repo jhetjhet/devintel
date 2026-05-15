@@ -28,7 +28,7 @@ export function FileStructure({ file_health_entries, architectural_recommendatio
                 <span className="text-sm font-mono font-bold text-white/80">{folder.path}</span>
               </div>
               <div className="space-y-1">
-                <div className="flex justify-between text-[10px] font-mono text-white/40 mb-1">
+                <div className="flex justify-between text-[12px] font-mono text-white/40 mb-1">
                   <span>HEALTH</span>
                   <span className={cn(
                     (folder.health_score ?? 0) > 80 ? "text-secondary" :
@@ -38,7 +38,7 @@ export function FileStructure({ file_health_entries, architectural_recommendatio
                 <Progress value={folder.health_score ?? 0} className="h-1 bg-white/5" />
               </div>
               <div className="mt-4 flex justify-between items-center">
-                <span className="text-[10px] text-white/20 uppercase font-mono">{folder.file_count ?? 0} objects</span>
+                <span className="text-[12px] text-white/20 uppercase font-mono">{folder.file_count ?? 0} objects</span>
                 <ChevronRight size={14} className="text-white/0 group-hover:text-white/40 transition-all" />
               </div>
             </div>

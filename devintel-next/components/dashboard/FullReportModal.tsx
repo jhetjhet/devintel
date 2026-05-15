@@ -161,8 +161,8 @@ export function FullReportModal({ isOpen, onClose, report }: FullReportModalProp
                            "{report.llm_insights.ai_reasoning}"
                          </p>
                          <div className="flex gap-3 mt-6">
-                           <div className="px-3 py-1.5 bg-primary/20 rounded-lg text-[10px] text-primary font-bold tracking-wider">INSIGHT_{report.job_id.split('_').pop()}</div>
-                           <div className="px-3 py-1.5 bg-destructive/20 rounded-lg text-[10px] text-destructive font-bold tracking-wider">DEBT_DETECTED</div>
+                           <div className="px-3 py-1.5 bg-primary/20 rounded-lg text-[12px] text-primary font-bold tracking-wider">INSIGHT_{report.job_id.split('_').pop()}</div>
+                           <div className="px-3 py-1.5 bg-destructive/20 rounded-lg text-[12px] text-destructive font-bold tracking-wider">DEBT_DETECTED</div>
                          </div>
                        </div>
                     </div>
@@ -182,7 +182,7 @@ export function FullReportModal({ isOpen, onClose, report }: FullReportModalProp
                     </div>
 
                     <div className="p-6 bg-white/5 border border-white/5 rounded-2xl">
-                        <h4 className="text-[10px] font-mono text-white/40 uppercase mb-5 text-center tracking-[0.3em]">Hotspot Clusters</h4>
+                        <h4 className="text-[12px] font-mono text-white/40 uppercase mb-5 text-center tracking-[0.3em]">Hotspot Clusters</h4>
                         <div className="space-y-3">
                            {report.deterministic_report.cluster_summary.top_clusters.map((c, i) => (
                              <div key={i} className="flex justify-between items-center text-[11px] font-mono p-2 hover:bg-white/5 rounded transition-colors group">

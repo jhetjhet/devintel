@@ -13,12 +13,11 @@ import { TrendsChart } from "./dashboard/TrendsChart";
 import { RiskyEntitiesChart } from "./dashboard/RiskyEntitiesChart";
 import { DependenciesHealth } from "./dashboard/DependenciesHealth";
 import { LanguageFrameworkDistribution } from "./dashboard/LanguageFrameworkDistribution";
-import { SecurityEvolution } from "./dashboard/SecurityEvolution";
-import { FindingsSmellsTrend } from "./dashboard/FindingsSmellsTrend";
 import {
   AnalysisRunDetail,
   AnalysisRunSummary,
   AnalysisRunSummarySchema,
+  RepositoryDetails,
 } from "@/types/repository";
 import useSWR from "swr";
 
@@ -37,8 +36,6 @@ async function fetchReporsts(
 
     const data = await response.json();
 
-    console.log("Raw reports data:", data);
-
     const dataRes = AnalysisRunSummarySchema.array().safeParse(data);
 
     if (!dataRes.success) {
@@ -54,14 +51,15 @@ async function fetchReporsts(
 }
 
 type DashboardProps = {
-  repositoryId: string;
-  analysisDetails: AnalysisRunDetail;
+  repositoryDetails: RepositoryDetails;
+  reportDetails: AnalysisRunDetail;
 };
 
-export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
+export function Dashboard({ repositoryDetails, reportDetails }: DashboardProps) {
   const [selectedRefactor, setSelectedRefactor] = useState(0);
-  // const [activeReportTab, setActiveReportTab] = useState<"structured_report" | "growth_report">("structured_report");
   const [activeMetric, setActiveMetric] = useState<"debt" | "score">("score");
+
+  const repositoryId = repositoryDetails.id;
 
   const { data: reportHistory, isLoading: reportHistoryLoading } = useSWR(
     `repository-${repositoryId}-reports`,
@@ -86,7 +84,7 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
     });
 
   const currentRefactor =
-    analysisDetails.refactor_suggestions[selectedRefactor];
+    reportDetails.refactor_suggestions[selectedRefactor];
   const refactorDiff = currentRefactor
     ? {
         header: currentRefactor.title ?? "Refactor Suggestion",
@@ -100,12 +98,8 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
     <div className="min-h-screen bg-surface p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
         <Header
-          repo_name={analysisDetails.repo_name}
-          commit_hash={analysisDetails.commit_hash}
-          branch={analysisDetails.branch}
-          overall_score={analysisDetails.overall_score}
-          overall_verdict={analysisDetails.overall_verdict}
-          scanned_at={analysisDetails.scanned_at}
+          repositoryDetails={repositoryDetails}
+          reportDetails={reportDetails}
         />
 
         <Tabs defaultValue="structure" className="w-full">
@@ -127,27 +121,27 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
           <TabsContent value="structured_report" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
               <OverviewMetrics
-                overall_score={analysisDetails.overall_score}
-                technical_debt_score={analysisDetails.technical_debt_score}
-                confidence={analysisDetails.confidence}
-                total_findings={analysisDetails.total_findings}
-                radar_metrics={analysisDetails.radar_metrics}
+                overall_score={reportDetails.overall_score}
+                technical_debt_score={reportDetails.technical_debt_score}
+                confidence={reportDetails.confidence}
+                total_findings={reportDetails.total_findings}
+                radar_metrics={reportDetails.radar_metrics}
               />
             </div>
 
             {/* Score & Debt over time */}
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-              <QuickWins quick_wins={analysisDetails.quick_wins} />
+              <QuickWins quick_wins={reportDetails.quick_wins} />
               <LanguageFrameworkDistribution
-                languages={analysisDetails.languages}
-                frameworks={analysisDetails.frameworks}
+                languages={reportDetails.languages}
+                frameworks={reportDetails.frameworks}
               />
             </div>
 
             {/* Risky entities + Dependencies */}
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-              <RiskyEntitiesChart entities={analysisDetails.risky_entities} />
-              <DependenciesHealth dependencies={analysisDetails.dependencies} />
+              <RiskyEntitiesChart entities={reportDetails.risky_entities} />
+              <DependenciesHealth dependencies={reportDetails.dependencies} />
             </div>
 
             <Tabs defaultValue="structure" className="w-full">
@@ -161,7 +155,7 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
                 <TabsTrigger
                   value="refactor"
                   className="data-active:bg-primary data-active:text-white"
-                  disabled={analysisDetails.refactor_suggestions.length === 0}
+                  disabled={reportDetails.refactor_suggestions.length === 0}
                 >
                   AI Refactor Lab
                 </TabsTrigger>
@@ -169,7 +163,7 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
                   value="security"
                   className="data-active:bg-primary data-active:text-white"
                   disabled={
-                    analysisDetails.security_vulnerabilities.length === 0
+                    reportDetails.security_vulnerabilities.length === 0
                   }
                 >
                   Security Audit
@@ -178,18 +172,18 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
 
               <TabsContent value="structure" className="mt-6">
                 <FileStructure
-                  file_health_entries={analysisDetails.file_health_entries}
+                  file_health_entries={reportDetails.file_health_entries}
                   architectural_recommendations={
-                    analysisDetails.architectural_recommendations
+                    reportDetails.architectural_recommendations
                   }
                 />
               </TabsContent>
 
               <TabsContent value="refactor" className="mt-6">
-                {analysisDetails.refactor_suggestions.length > 0 && (
+                {reportDetails.refactor_suggestions.length > 0 && (
                   <div className="space-y-4">
                     <div className="flex gap-2 overflow-x-auto pb-2">
-                      {analysisDetails.refactor_suggestions.map((sugg, idx) => (
+                      {reportDetails.refactor_suggestions.map((sugg, idx) => (
                         <button
                           key={idx}
                           onClick={() => setSelectedRefactor(idx)}
@@ -209,17 +203,17 @@ export function Dashboard({ repositoryId, analysisDetails }: DashboardProps) {
               </TabsContent>
 
               <TabsContent value="security" className="mt-6">
-                {analysisDetails.security_vulnerabilities.length > 0 && (
+                {reportDetails.security_vulnerabilities.length > 0 && (
                   <SecurityAudit
-                    vulnerabilities={analysisDetails.security_vulnerabilities}
+                    vulnerabilities={reportDetails.security_vulnerabilities}
                     security_critical_count={
-                      analysisDetails.security_critical_count
+                      reportDetails.security_critical_count
                     }
-                    security_high_count={analysisDetails.security_high_count}
+                    security_high_count={reportDetails.security_high_count}
                     security_medium_count={
-                      analysisDetails.security_medium_count
+                      reportDetails.security_medium_count
                     }
-                    security_low_count={analysisDetails.security_low_count}
+                    security_low_count={reportDetails.security_low_count}
                   />
                 )}
               </TabsContent>

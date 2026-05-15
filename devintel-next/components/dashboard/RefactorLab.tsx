@@ -33,8 +33,8 @@ export function RefactorLab({ diff }: RefactorLabProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-3">
               <div className="flex justify-between items-center px-2">
-                 <span className="text-[10px] font-mono text-destructive uppercase font-bold tracking-widest">Legacy (Monolithic)</span>
-                 <span className="text-[10px] font-mono text-white/20 tracking-widest">v1.2.4</span>
+                 <span className="text-[12px] font-mono text-destructive uppercase font-bold tracking-widest">Legacy (Monolithic)</span>
+                 <span className="text-[12px] font-mono text-white/20 tracking-widest">v1.2.4</span>
               </div>
               <div className="relative group">
                 <button className="absolute top-4 right-4 p-2 bg-black/40 rounded-lg text-white/0 group-hover:text-white/40 transition-all">
@@ -47,8 +47,8 @@ export function RefactorLab({ diff }: RefactorLabProps) {
             </div>
             <div className="space-y-3">
               <div className="flex justify-between items-center px-2">
-                 <span className="text-[10px] font-mono text-secondary uppercase font-bold tracking-widest">Refactored (Modular)</span>
-                 <span className="text-[10px] font-mono text-secondary/40 tracking-widest">PROPOSED</span>
+                 <span className="text-[12px] font-mono text-secondary uppercase font-bold tracking-widest">Refactored (Modular)</span>
+                 <span className="text-[12px] font-mono text-secondary/40 tracking-widest">PROPOSED</span>
               </div>
               <div className="relative group">
                 <button className="absolute top-4 right-4 p-2 bg-secondary/10 rounded-lg text-white/0 group-hover:text-secondary transition-all">

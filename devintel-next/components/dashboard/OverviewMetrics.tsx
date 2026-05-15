@@ -62,7 +62,7 @@ export function OverviewMetrics({
               <span className="text-4xl font-black text-white">
                 {overall_score ?? "—"}
               </span>
-              <span className="text-[10px] text-white/40 uppercase font-mono tracking-widest">
+              <span className="text-[12px] text-white/40 uppercase font-mono tracking-widest">
                 Health
               </span>
             </div>
@@ -72,7 +72,7 @@ export function OverviewMetrics({
               <div className="text-xs text-warning font-bold">
                 {technical_debt_score ?? "—"}
               </div>
-              <div className="text-[10px] text-white/40 uppercase font-mono">
+              <div className="text-[12px] text-white/40 uppercase font-mono">
                 Tech Debt
               </div>
             </div>
@@ -81,7 +81,7 @@ export function OverviewMetrics({
               <div className="text-xs text-primary font-bold">
                 {total_findings ?? "—"}
               </div>
-              <div className="text-[10px] text-white/40 uppercase font-mono">
+              <div className="text-[12px] text-white/40 uppercase font-mono">
                 Findings
               </div>
             </div>
@@ -90,7 +90,7 @@ export function OverviewMetrics({
               <div className="text-xs text-secondary font-bold">
                 {confidence !== null ? `${Math.round(confidence * 100)}%` : "—"}
               </div>
-              <div className="text-[10px] text-white/40 uppercase font-mono">
+              <div className="text-[12px] text-white/40 uppercase font-mono">
                 Confidence
               </div>
             </div>

@@ -5,7 +5,7 @@ export default function Loading() {
         <div className="absolute inset-0 rounded-full border-2 border-white/5" />
         <div className="absolute inset-0 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
       </div>
-      <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.2em]">
+      <p className="text-[12px] font-mono text-white/20 uppercase tracking-[0.2em]">
         Loading
       </p>
     </div>

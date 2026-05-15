@@ -1,5 +1,5 @@
 import { Dashboard } from "@/components/Dashboard";
-import { AnalysisRunDetail, AnalysisRunDetailSchema } from "@/types/repository";
+import { AnalysisRunDetail, AnalysisRunDetailSchema, RepositoryDetails, RepositoryDetailsSchema } from "@/types/repository";
 
 type DashboardPageProps = {
   params: {
@@ -9,6 +9,23 @@ type DashboardPageProps = {
     analysis_run_id?: string;
   };
 };
+
+async function fetchRepoDetail(repositoryId: string): Promise<RepositoryDetails> {
+  const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch repository detail");
+  }
+
+  const dataRes = RepositoryDetailsSchema.safeParse(await response.json());
+
+  if (!dataRes.success) {
+    console.error("Invalid repository detail response:", dataRes.error);
+    throw new Error("Invalid repository detail response");
+  }
+
+  return dataRes.data;
+}
 
 async function fetchReportData(repositoryId: string, analysisRunId: string): Promise<AnalysisRunDetail> {
   const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}/reports/${analysisRunId}`);
@@ -31,12 +48,13 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const { id } = await params;
   const { analysis_run_id } = await searchParams;
 
+  const repoDetail = await fetchRepoDetail(id);
   const reportData = await fetchReportData(id, analysis_run_id || "latest");
-
+console.log("Fetched repository detail:", repoDetail);
   return (
     <Dashboard 
-      analysisDetails={reportData} 
-      repositoryId={id}
+      repositoryDetails={repoDetail}
+      reportDetails={reportData} 
     />
   );
 }
