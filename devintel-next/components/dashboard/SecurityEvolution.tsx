@@ -50,7 +50,7 @@ export function SecurityEvolution({ runs }: SecurityEvolutionProps) {
           <ShieldAlert size={16} className="text-secondary" />
           Security Evolution
         </CardTitle>
-        <CardDescription className="text-[10px] text-white/30 italic">
+        <CardDescription className="text-[12px] text-white/30 italic">
           Vulnerability counts per analysis run
         </CardDescription>
       </CardHeader>

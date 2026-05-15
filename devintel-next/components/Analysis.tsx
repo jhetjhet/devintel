@@ -144,7 +144,7 @@ export function Analysis({ repositoryId, force = false }: AnalysisProps) {
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between text-[10px] font-mono text-white/40 mb-2">
+          <div className="flex justify-between text-[12px] font-mono text-white/40 mb-2">
              <span>PROGRESSIVE ANALYSIS</span>
              <span className="text-primary">{progress}%</span>
           </div>
@@ -154,11 +154,11 @@ export function Analysis({ repositoryId, force = false }: AnalysisProps) {
         <div className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-left">
           <div className="flex items-center gap-2 mb-3 border-b border-white/5 pb-2">
             <Terminal size={14} className="text-white/20" />
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Worker Logs</span>
+            <span className="text-[12px] font-mono text-white/20 uppercase tracking-widest">Worker Logs</span>
           </div>
           <ScrollArea className="h-32 pr-4">
             {logs.map((log, i) => (
-              <div key={i} className="text-[10px] font-mono text-white/60 mb-1 flex gap-3">
+              <div key={i} className="text-[12px] font-mono text-white/60 mb-1 flex gap-3">
                 <span className="text-white/20">[{new Date().toLocaleTimeString()}]</span>
                 <span className={i === logs.length - 1 ? "text-primary transition-all glow-primary" : ""}>
                    {i === logs.length - 1 && "> "}
@@ -178,7 +178,7 @@ export function Analysis({ repositoryId, force = false }: AnalysisProps) {
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center gap-2 opacity-20">
               <div className="p-3 bg-white/5 rounded-xl text-white">{item.icon}</div>
-              <span className="text-[10px] font-mono text-white uppercase tracking-widest">{item.label}</span>
+              <span className="text-[12px] font-mono text-white uppercase tracking-widest">{item.label}</span>
             </div>
           ))}
         </div>

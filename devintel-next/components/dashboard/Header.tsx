@@ -1,34 +1,24 @@
 "use client";
 
+import { AnalysisRunDetail, RepositoryDetails } from "@/types/repository";
 import { LayoutDashboard, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type HeaderProps = {
-  repo_name: string | null;
-  commit_hash: string | null;
-  branch: string | null;
-  overall_score: number | null;
-  overall_verdict: string | null;
-  scanned_at: string | null;
+  repositoryDetails: RepositoryDetails;
+  reportDetails: AnalysisRunDetail;
 };
 
-export function Header({
-  repo_name,
-  commit_hash,
-  branch,
-  overall_score,
-  overall_verdict,
-  scanned_at,
-}: HeaderProps) {
+export function Header({ repositoryDetails, reportDetails }: HeaderProps) {
   const [lastAnalysisTime, setLastAnalysisTime] = useState<string | null>(null);
 
   useEffect(() => {
-    if (scanned_at) {
-      const date = new Date(scanned_at);
+    if (reportDetails.scanned_at) {
+      const date = new Date(reportDetails.scanned_at);
       setLastAnalysisTime(date.toLocaleString());
     }
-  }, [scanned_at]);
+  }, [reportDetails.scanned_at]);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -38,14 +28,22 @@ export function Header({
           Dev. Intelligence
         </h1>
         <p className="text-white/40 mt-1">
-          Repo: <span className="text-primary">{repo_name ?? "—"}</span> •{" "}
-          Branch: <span className="text-white/60">{branch ?? "—"}</span> •{" "}
+          Repo:{" "}
+          <span className="text-primary">
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href={repositoryDetails.repo_url}
+            >
+              {repositoryDetails.repo_name}
+            </Link>
+          </span>{" "}
           Commit:{" "}
           <span className="text-white/60 font-mono text-xs">
-            {commit_hash?.slice(0, 7) ?? "—"}
+            {reportDetails.commit_hash?.slice(0, 7) ?? "—"}
           </span>
         </p>
-        {scanned_at && (
+        {reportDetails.scanned_at && (
           <p className="text-white/20 text-xs mt-0.5">
             Last analyzed: {lastAnalysisTime}
           </p>
@@ -60,17 +58,17 @@ export function Header({
           <Plus size={12} />
           Run New Audit
         </Link>
-        {overall_verdict && (
+        {reportDetails.overall_verdict && (
           <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-bold uppercase">
-            {overall_verdict}
+            {reportDetails.overall_verdict}
           </span>
         )}
-        {overall_score !== null && (
+        {reportDetails.overall_score !== null && (
           <div className="text-right">
             <div className="text-3xl font-black text-white">
-              {overall_score}
+              {reportDetails.overall_score}
             </div>
-            <div className="text-[10px] text-white/40 uppercase font-mono tracking-widest">
+            <div className="text-[12px] text-white/40 uppercase font-mono tracking-widest">
               Health Score
             </div>
           </div>

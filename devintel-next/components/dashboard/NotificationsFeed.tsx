@@ -36,9 +36,9 @@ export function NotificationsFeed({ notifications }: NotificationsFeedProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
                     <h4 className="text-xs font-bold text-white/90 truncate">{notif.title}</h4>
-                    <span className="text-[10px] font-mono text-secondary font-bold shrink-0">{notif.points}</span>
+                    <span className="text-[12px] font-mono text-secondary font-bold shrink-0">{notif.points}</span>
                   </div>
-                  <p className="text-[10px] text-white/40 mt-0.5 line-clamp-1">{notif.desc}</p>
+                  <p className="text-[12px] text-white/40 mt-0.5 line-clamp-1">{notif.desc}</p>
                 </div>
               </div>
             ))}

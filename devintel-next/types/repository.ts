@@ -183,6 +183,14 @@ export const AnalysisStatusResponseSchema = z.object({
   analysis_status: z.string().nullable(),
 });
 
+export const RepositoryDetailsSchema = z.object({
+  id: z.string(),
+  repo_url: z.string(),
+  provider: z.string().nullable(),
+  owner_name: z.string().nullable(),
+  repo_name: z.string().nullable(),
+});
+
 // ---------------------------------------------------------------------------
 // Inferred types
 // ---------------------------------------------------------------------------
@@ -203,3 +211,4 @@ export type AnalysisRunDetail = z.infer<typeof AnalysisRunDetailSchema>;
 export type AnalysisStatusResponse = z.infer<
   typeof AnalysisStatusResponseSchema
 >;
+export type RepositoryDetails = z.infer<typeof RepositoryDetailsSchema>;

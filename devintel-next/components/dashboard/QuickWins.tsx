@@ -29,7 +29,7 @@ export function QuickWins({ quick_wins }: QuickWinsProps) {
                   </h4>
                   <span
                     className={cn(
-                      "text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-black/40",
+                      "text-[12px] uppercase font-bold px-1.5 py-0.5 rounded bg-black/40",
                       win.impact === "High"
                         ? "text-destructive"
                         : win.impact === "Medium"
@@ -40,7 +40,7 @@ export function QuickWins({ quick_wins }: QuickWinsProps) {
                     {win.impact}
                   </span>
                 </div>
-                <p className="text-[10px] text-white/40 font-mono truncate">
+                <p className="text-[12px] text-white/40 font-mono truncate">
                   {win.description}
                 </p>
               </div>

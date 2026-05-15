@@ -21,9 +21,9 @@ export default function HomeHeader() {
         track technical debt, and uncover security risks automatically.
       </p>
       <div className="flex items-center gap-2 pt-1">
-        <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Supports</span>
-        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">JS / TS</span>
-        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">Python</span>
+        <span className="text-[12px] font-mono text-white/20 uppercase tracking-widest">Supports</span>
+        <span className="text-[12px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">JS / TS</span>
+        <span className="text-[12px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">Python</span>
       </div>
     </div>
   );

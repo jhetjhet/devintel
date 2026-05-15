@@ -41,7 +41,7 @@ export function RiskyEntitiesChart({ entities }: RiskyEntitiesChartProps) {
           <AlertTriangle size={16} className="text-warning" />
           Top Risky Entities
         </CardTitle>
-        <CardDescription className="text-[10px] text-white/30 italic">
+        <CardDescription className="text-[12px] text-white/30 italic">
           Entities ranked by pain score
         </CardDescription>
       </CardHeader>

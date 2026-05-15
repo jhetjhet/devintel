@@ -87,7 +87,7 @@ export default function HomeContent() {
           </button>
         </form>
 
-        <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.2em] flex items-center gap-3">
+        <p className="text-[12px] font-mono text-white/20 uppercase tracking-[0.2em] flex items-center gap-3">
           <Terminal size={12} />
           LLM-assisted · debt, risk &amp; growth signals per commit
         </p>

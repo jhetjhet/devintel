@@ -43,7 +43,7 @@ export function SecurityAudit({
               {vulnerabilities.length} vulnerabilities found.
             </CardDescription>
           </div>
-          <div className="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full text-secondary text-[10px] font-bold">
+          <div className="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full text-secondary text-[12px] font-bold">
             {(security_critical_count ?? 0) > 0 ? "CRITICAL" : "SECURE"}
           </div>
         </div>
@@ -56,7 +56,7 @@ export function SecurityAudit({
                 <div className="text-destructive font-bold text-2xl font-mono">
                   {security_critical_count ?? 0}
                 </div>
-                <div className="text-[10px] text-white/40 uppercase font-mono mt-1">
+                <div className="text-[12px] text-white/40 uppercase font-mono mt-1">
                   Critical
                 </div>
               </div>
@@ -64,7 +64,7 @@ export function SecurityAudit({
                 <div className="text-orange-400 font-bold text-2xl font-mono">
                   {security_high_count ?? 0}
                 </div>
-                <div className="text-[10px] text-white/40 uppercase font-mono mt-1">
+                <div className="text-[12px] text-white/40 uppercase font-mono mt-1">
                   High
                 </div>
               </div>
@@ -72,7 +72,7 @@ export function SecurityAudit({
                 <div className="text-warning font-bold text-2xl font-mono">
                   {security_medium_count ?? 0}
                 </div>
-                <div className="text-[10px] text-white/40 uppercase font-mono mt-1">
+                <div className="text-[12px] text-white/40 uppercase font-mono mt-1">
                   Medium
                 </div>
               </div>
@@ -80,7 +80,7 @@ export function SecurityAudit({
                 <div className="text-primary font-bold text-2xl font-mono">
                   {security_low_count ?? 0}
                 </div>
-                <div className="text-[10px] text-white/40 uppercase font-mono mt-1">
+                <div className="text-[12px] text-white/40 uppercase font-mono mt-1">
                   Low
                 </div>
               </div>
@@ -108,7 +108,7 @@ export function SecurityAudit({
                         <h4 className="text-sm font-bold text-white/90">
                           {vuln.title}
                         </h4>
-                        <p className="text-[10px] text-white/40 font-mono">
+                        <p className="text-[12px] text-white/40 font-mono">
                           Found in {vuln.location ?? vuln.file_path}
                         </p>
                       </div>
@@ -116,11 +116,11 @@ export function SecurityAudit({
                   </AccordionTrigger>
                   <AccordionContent className="bg-black/20 p-4 rounded-lg text-xs leading-relaxed text-white/60">
                     <p className="mb-3">{vuln.description}</p>
-                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md font-mono text-[10px] text-destructive-foreground">
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md font-mono text-[12px] text-destructive-foreground">
                       Recommendation: {vuln.remediation}
                     </div>
                     {vuln.cve && (
-                      <div className="mt-2 text-[10px] font-mono text-white/30">
+                      <div className="mt-2 text-[12px] font-mono text-white/30">
                         CVE: {vuln.cve}
                       </div>
                     )}
