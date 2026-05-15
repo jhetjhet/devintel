@@ -3,10 +3,8 @@ import { AnalysisRunDetail, AnalysisRunDetailSchema, RepositoryDetails, Reposito
 
 type DashboardPageProps = {
   params: {
-    id: string;
-  };
-  searchParams: {
-    analysis_run_id?: string;
+    repo_id: string;
+    analysis_run_id: string;
   };
 };
 
@@ -44,12 +42,11 @@ async function fetchReportData(repositoryId: string, analysisRunId: string): Pro
   return dataRes.data;
 }
 
-export default async function DashboardPage({ params, searchParams }: DashboardPageProps) {
-  const { id } = await params;
-  const { analysis_run_id } = await searchParams;
+export default async function DashboardPage({ params }: DashboardPageProps) {
+  const { repo_id, analysis_run_id } = await params;
 
-  const repoDetail = await fetchRepoDetail(id);
-  const reportData = await fetchReportData(id, analysis_run_id || "latest");
+  const repoDetail = await fetchRepoDetail(repo_id);
+  const reportData = await fetchReportData(repo_id, analysis_run_id || "latest");
 console.log("Fetched repository detail:", repoDetail);
   return (
     <Dashboard 
