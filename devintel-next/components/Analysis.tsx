@@ -44,9 +44,7 @@ export function Analysis({ repositoryId }: AnalysisProps) {
 
   useEffect(() => {
     async function fetchRepository() {
-      const response = await fetch(
-        `http://localhost:8000/api/repositories/${repositoryId}`,
-      );
+      const response = await fetch(`/fast-api/repositories/${repositoryId}`);
 
       if (!response.ok) {
         console.error(

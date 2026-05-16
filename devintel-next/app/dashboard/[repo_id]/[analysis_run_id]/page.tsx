@@ -9,7 +9,7 @@ type DashboardPageProps = {
 };
 
 async function fetchRepoDetail(repositoryId: string): Promise<RepositoryDetails> {
-  const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}`);
+  const response = await fetch(`${process.env.API_ENDPOINT}/api/repositories/${repositoryId}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch repository detail");
@@ -26,7 +26,7 @@ async function fetchRepoDetail(repositoryId: string): Promise<RepositoryDetails>
 }
 
 async function fetchReportData(repositoryId: string, analysisRunId: string): Promise<AnalysisRunDetail> {
-  const response = await fetch(`http://devintel-api:8000/api/repositories/${repositoryId}/reports/${analysisRunId}`);
+  const response = await fetch(`${process.env.API_ENDPOINT}/api/repositories/${repositoryId}/reports/${analysisRunId}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch report data");

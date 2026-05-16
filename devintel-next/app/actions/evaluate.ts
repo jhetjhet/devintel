@@ -7,7 +7,7 @@ export const analyzeRepo = async (repo_url: string): Promise<FetchResponse<Repos
     try {
         const jsonData = JSON.stringify({ repo_url });
 
-        const response = await fetch("http://devintel-api:8000/api/analysis/", {
+        const response = await fetch(`${process.env.API_ENDPOINT}/api/analysis/`, {
             method: "POST",
             body: jsonData,
             headers: {
@@ -32,7 +32,7 @@ export const analyzeRepo = async (repo_url: string): Promise<FetchResponse<Repos
 
 export const finalizeAnalysis = async (repositoryId: string): Promise<FetchResponse<AnalysisCompleteResponse>> => {
     try {
-        const response = await fetch(`http://devintel-api:8000/api/analysis/complete/${repositoryId}`, {
+        const response = await fetch(`${process.env.API_ENDPOINT}/api/analysis/complete/${repositoryId}`, {
             method: "POST",
         });
 
@@ -58,7 +58,7 @@ export const startAudit = async (repository_id: string, force: boolean = false):
     try {
         const jsonData = JSON.stringify({ repository_id, force });
 
-        const response = await fetch("http://devintel-api:8000/api/audit/", {
+        const response = await fetch(`${process.env.API_ENDPOINT}/api/audit/`, {
             method: "POST",
             body: jsonData,
             headers: {

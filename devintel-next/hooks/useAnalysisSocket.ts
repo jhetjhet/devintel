@@ -1,6 +1,7 @@
 import { AuditProgress } from "@/types/api";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import useConfig from "./useConfig";
 
 export default function useAnalysisSocket(
   repositoryId: string | undefined,
@@ -12,10 +13,12 @@ export default function useAnalysisSocket(
   const [progress, setProgress] = useState<number>(0);
   const [auditLogs, setAuditLogs] = useState<AuditProgress[]>([]);
 
-  useEffect(() => {
-    if (!repositoryId) return;
+  const config = useConfig();
 
-    const socket = io("ws://localhost:8000", {
+  useEffect(() => {
+    if (!repositoryId || !config) return;
+
+    const socket = io(config.api_endpoint, {
       auth: {
         repository_id: repositoryId,
       },
@@ -73,7 +76,7 @@ export default function useAnalysisSocket(
     return () => {
       socket.disconnect();
     };
-  }, [repositoryId]);
+  }, [repositoryId, config]);
 
   return { progress, auditLogs };
 }

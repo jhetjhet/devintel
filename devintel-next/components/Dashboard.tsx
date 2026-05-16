@@ -25,9 +25,7 @@ async function fetchReporsts(
   repositoryId: string,
 ): Promise<AnalysisRunSummary[]> {
   try {
-    const response = await fetch(
-      `http://localhost:8000/api/repositories/${repositoryId}/reports/`,
-    );
+    const response = await fetch(`/fast-api/repositories/${repositoryId}/reports/`);
 
     if (!response.ok) {
       console.error("Failed to fetch reports:", await response.text());
