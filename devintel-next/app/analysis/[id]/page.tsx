@@ -1,3 +1,4 @@
+import { startAudit } from '@/app/actions/evaluate';
 import { AnalysisCompleted } from '@/components/AnalysisCompleted';
 import { AnalysisInPending } from '@/components/AnalysisInPending';
 import { fetchAnalysisStatus } from '@/lib/api.server';
@@ -13,6 +14,11 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
   const { id } = await params;
 
   const analysisStatus = await fetchAnalysisStatus(id);
+
+  if (!analysisStatus.recent_analysis_run) {
+    await startAudit(id);
+    redirect(`/analysis/${id}/progress`);
+  }
 
   if (analysisStatus.analysis_status === "progress") {
     redirect(`/analysis/${id}/progress`);
