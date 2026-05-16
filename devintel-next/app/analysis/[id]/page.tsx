@@ -4,6 +4,8 @@ import { AnalysisInPending } from '@/components/AnalysisInPending';
 import { fetchAnalysisStatus } from '@/lib/api.server';
 import { redirect } from 'next/navigation';
 
+export const dynamic = "force-dynamic";
+
 type AnalysisPageProps = {
   params: {
     id: string;
@@ -16,7 +18,17 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
   const analysisStatus = await fetchAnalysisStatus(id);
 
   if (!analysisStatus.recent_analysis_run) {
-    await startAudit(id);
+    const response = await startAudit(id);
+
+    if (!response.success) {
+      if (response.status === 429) {
+        throw new Error("Due to resource constraints, we are currently limiting the number of concurrent analyses. Please try again in a few minutes.");
+      }
+      else {
+        throw new Error(response.error.message || "Failed to start analysis");
+      }
+    }
+
     redirect(`/analysis/${id}/progress`);
   }
 

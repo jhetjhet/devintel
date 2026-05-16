@@ -4,10 +4,11 @@ import { motion } from "motion/react";
 import { CheckCircle2, RotateCw, Eye, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { startAudit } from "@/app/actions/evaluate";
 import { AnalysisStatusResponse } from "@/types/repository";
 import { Button } from "./ui/button";
+import useAudit from "@/hooks/useAudit";
 
 type AnalysisCompletedProps = {
   analysisStatus: AnalysisStatusResponse;
@@ -16,7 +17,13 @@ type AnalysisCompletedProps = {
 export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
   const router = useRouter();
 
-  const [auditIsPending, startAuditTransition] = useTransition();
+  const { error, auditIsPending, analysisRes, initiateAudit } = useAudit();
+
+  useEffect(() => {
+    if (!analysisRes) return;
+
+    router.push(`/analysis/${analysisRes.repository_id}/progress`);
+  }, [analysisRes]);
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6 md:p-12">
@@ -95,6 +102,9 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
           </div>
         </div>
 
+        {/* Error */}
+        {error && <p className="text-xs text-destructive mb-4 px-1">{error}</p>}
+
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Link
@@ -109,23 +119,7 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
             variant="ghost"
             size="md"
             disabled={auditIsPending}
-            onClick={() => {
-              startAuditTransition(async () => {
-                const respose = await startAudit(
-                  analysisStatus.repository_id,
-                  true,
-                );
-
-                if (!respose.success) {
-                  console.error("Failed to start audit:", respose.error);
-                  return;
-                }
-
-                router.push(
-                  `/analysis/${respose.data?.repository_id}/progress`,
-                );
-              });
-            }}
+            onClick={() => initiateAudit(analysisStatus.repository_id, true)}
           >
             <RotateCw size={16} />
             {auditIsPending ? "Running New Analysis..." : "Run New Analysis"}

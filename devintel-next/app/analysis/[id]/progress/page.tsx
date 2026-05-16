@@ -2,6 +2,8 @@ import { Analysis } from "@/components/Analysis";
 import { fetchAnalysisStatus } from "@/lib/api.server";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type AnalysisPageProps = {
   params: {
     id: string;
