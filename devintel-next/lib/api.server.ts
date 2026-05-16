@@ -8,7 +8,7 @@ export async function fetchAnalysisStatus(
   id: string,
 ): Promise<AnalysisStatusResponse> {
   const data = await typedFetch<AnalysisStatusResponse>(
-    `http://devintel-api:8000/api/analysis/${id}/status/`,
+    `${process.env.API_ENDPOINT}/api/analysis/${id}/status/`,
   );
 
   const dataRes = AnalysisStatusResponseSchema.safeParse(data);
