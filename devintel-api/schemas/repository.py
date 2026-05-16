@@ -11,3 +11,13 @@ class RepositoryResponse(BaseModel):
     provider: str | None = None
     owner_name: str | None = None
     repo_name: str | None = None
+
+
+class AuditRequest(BaseModel):
+    repository_id: str
+    force: bool = False
+
+
+class AuditResponse(BaseModel):
+    repository_id: str
+    commit_hash: str

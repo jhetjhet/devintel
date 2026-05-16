@@ -4,19 +4,18 @@ import { motion } from "motion/react";
 import { CheckCircle2, RotateCw, Eye, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTransition } from "react";
+import { startAudit } from "@/app/actions/evaluate";
+import { AnalysisStatusResponse } from "@/types/repository";
 
 type AnalysisCompletedProps = {
-  repositoryId: string;
-  commitHash: string;
-  analysisRunId?: string;
+  analysisStatus: AnalysisStatusResponse;
 };
 
-export function AnalysisCompleted({
-  repositoryId,
-  commitHash,
-  analysisRunId,
-}: AnalysisCompletedProps) {
+export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
   const router = useRouter();
+
+  const [auditIsPending, startAuditTransition] = useTransition();
 
   return (
     <div className="min-h-screen bg-[#05070d] flex items-center justify-center p-6 md:p-12">
@@ -31,7 +30,10 @@ export function AnalysisCompleted({
           href="/"
           className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors mb-8 group"
         >
-          <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft
+            size={12}
+            className="group-hover:-translate-x-0.5 transition-transform"
+          />
           Back to Home
         </Link>
 
@@ -78,7 +80,7 @@ export function AnalysisCompleted({
                 Repository
               </span>
               <span className="text-white/60">
-                {repositoryId.slice(0, 8)}...
+                {analysisStatus.repository_id.slice(0, 8)}...
               </span>
             </div>
             <div>
@@ -86,7 +88,7 @@ export function AnalysisCompleted({
                 Commit
               </span>
               <span className="text-white/60">
-                {commitHash?.slice(0, 7) ?? "—"}
+                {analysisStatus.commit_hash.slice(0, 7) ?? "—"}
               </span>
             </div>
           </div>
@@ -94,22 +96,37 @@ export function AnalysisCompleted({
 
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() =>
-              router.push(`/dashboard/${repositoryId}?analysis_run_id=${analysisRunId}`)
-            }
+          <Link
+            href={`/dashboard/${analysisStatus.repository_id}/${analysisStatus.recent_analysis_run?.id}`}
             className="flex items-center justify-center gap-2 px-5 py-3 bg-secondary hover:bg-secondary/90 text-black font-bold text-sm rounded-xl transition-all duration-200"
           >
             <Eye size={16} />
             View Report
-          </button>
+          </Link>
 
           <button
-            onClick={() => router.push(`/analysis/${repositoryId}?force=true`)}
-            className="flex items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors"
+            disabled={auditIsPending}
+            onClick={() => {
+              startAuditTransition(async () => {
+                const respose = await startAudit(
+                  analysisStatus.repository_id,
+                  true,
+                );
+
+                if (!respose.success) {
+                  console.error("Failed to start audit:", respose.error);
+                  return;
+                }
+
+                router.push(
+                  `/analysis/${respose.data?.repository_id}/progress`,
+                );
+              });
+            }}
+            className="flex cursor-pointer items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-white/30 disabled:border-white/5"
           >
             <RotateCw size={16} />
-            Run New Analysis
+            {auditIsPending ? "Running New Analysis..." : "Run New Analysis"}
           </button>
         </div>
 

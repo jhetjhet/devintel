@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { AlertCircle, Zap, RotateCw, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { finalizeAnalysis } from "@/app/actions/evaluate";
+import { finalizeAnalysis, startAudit } from "@/app/actions/evaluate";
 
 interface AnalysisInProgressProps {
   repositoryId: string;
@@ -19,6 +19,7 @@ export function AnalysisInPending({
   const router = useRouter();
   
   const [finalizeAnalysisIsPending, startFinalizeAnalysisTransition] = useTransition();
+  const [auditIsPending, startAuditTransition] = useTransition();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -124,7 +125,18 @@ export function AnalysisInPending({
           </button>
 
           <button
-            onClick={() => router.push(`/analysis/${repositoryId}?force=true`)}
+            onClick={() => {
+              startAuditTransition(async () => {
+                const respose = await startAudit(repositoryId, true);
+                
+                if (!respose.success) {
+                  console.error("Failed to start audit:", respose.error);
+                  return;
+                }
+
+                router.push(`/analysis/${respose.data?.repository_id}/progress`);
+              });
+            }}
             disabled={finalizeAnalysisIsPending}
             className="flex items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors"
           >
