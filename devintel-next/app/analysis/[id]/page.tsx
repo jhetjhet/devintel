@@ -1,51 +1,28 @@
-import { Analysis } from '@/components/Analysis';
 import { AnalysisCompleted } from '@/components/AnalysisCompleted';
 import { AnalysisInPending } from '@/components/AnalysisInPending';
-import { AnalysisStatusResponse, AnalysisStatusResponseSchema } from '@/types/repository';
+import { fetchAnalysisStatus } from '@/lib/api.server';
+import { redirect } from 'next/navigation';
 
 type AnalysisPageProps = {
   params: {
     id: string;
   },
-  searchParams: {
-    force?: string;
-  };
 }
 
-async function fetchAnalysisStatus(id: string): Promise<AnalysisStatusResponse> {
-  const response = await fetch(`http://devintel-api:8000/api/analysis/${id}/status/`);
-  
-  if (!response.ok) {
-    throw new Error("Failed to fetch analysis status");
-  }
-
-  const dataRes = AnalysisStatusResponseSchema.safeParse(await response.json());
-  
-  if (!dataRes.success) {
-    console.error("Invalid analysis status response:", dataRes.error);
-    throw new Error("Invalid analysis status response");
-  }
-
-  return dataRes.data;
-}
-
-export default async function AnalysisPage({ params, searchParams }: AnalysisPageProps) {
+export default async function AnalysisPage({ params }: AnalysisPageProps) {
   const { id } = await params;
-  const { force } = await searchParams;
-
-  const isForceRefresh = force === "true";
 
   const analysisStatus = await fetchAnalysisStatus(id);
 
-  console.log("Analysis status:", isForceRefresh, analysisStatus);
+  if (analysisStatus.analysis_status === "progress") {
+    redirect(`/analysis/${id}/progress`);
+  }
 
-  if (analysisStatus.has_pending_result && !isForceRefresh) {
+  if (analysisStatus.has_pending_result) {
     return <AnalysisInPending repositoryId={id} commitHash={analysisStatus.commit_hash} />;
   }
 
-  if (analysisStatus.recent_analysis_run && !isForceRefresh) {
-    return <AnalysisCompleted repositoryId={id} commitHash={analysisStatus.commit_hash} analysisRunId={analysisStatus.recent_analysis_run.id} />;
+  if (analysisStatus.recent_analysis_run && !analysisStatus.has_pending_result) {
+    return <AnalysisCompleted analysisStatus={analysisStatus} />;
   }
-
-  return <Analysis repositoryId={id} force={isForceRefresh} />;
 }

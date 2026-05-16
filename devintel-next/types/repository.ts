@@ -180,7 +180,7 @@ export const AnalysisStatusResponseSchema = z.object({
   recent_analysis_run: PartialAnalysisRunSummarySchema.nullable(),
   analysis_run_count: z.number(),
   has_pending_result: z.boolean(),
-  analysis_status: z.string().nullable(),
+  analysis_status: z.enum(["progress", "completed"]).nullable(),
 });
 
 export const RepositoryDetailsSchema = z.object({

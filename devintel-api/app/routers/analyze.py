@@ -2,13 +2,26 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from schemas.repository import AnalyzeRequest, RepositoryResponse
+from schemas.repository import AnalyzeRequest, RepositoryResponse, AuditRequest, AuditResponse
 from schemas.analysis import AnalysisRunSummary, AnalysisRunDetail
 from services.repository_service import analyze_repository, get_repository_by_id
 from services.analysis_service import process_analysis_result, get_analysis_status
 from services.report_service import list_analysis_runs, get_analysis_run_detail, get_analysis_run_detail_by_id
+from services.audit_service import start_audit
 
 router = APIRouter()
+
+
+@router.post("/api/audit/", response_model=AuditResponse)
+async def trigger_audit(request: AuditRequest, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await start_audit(request.repository_id, request.force, db)
+        return AuditResponse(
+            repository_id=result["repository_id"],
+            commit_hash=result["commit_hash"],
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/api/analysis/", response_model=RepositoryResponse)
