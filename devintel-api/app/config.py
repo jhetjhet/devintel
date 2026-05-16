@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "deepseek-coder"
     LLM_BASE_URL: str = "https://api.deepseek.com"
     DEVINTEL_ENGINE_IMAGE: str = "devintel_engine"
+    MAX_AUDIT_WORKERS: int = 5
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

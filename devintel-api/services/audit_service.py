@@ -14,6 +14,10 @@ from app.models import Repository, AnalysisRun
 logger = logging.getLogger(__name__)
 
 
+class WorkerLimitReachedError(Exception):
+    """Raised when the configured worker-cap has been reached."""
+
+
 # ---------------------------------------------------------------------------
 # Docker helpers (sync — called via asyncio.to_thread)
 # ---------------------------------------------------------------------------
@@ -37,6 +41,17 @@ def _ensure_container_running(repo_url: str, repository_id: str, commit_hash: st
         logger.info("Removed stale container %s before re-spawning.", container_name)
     except docker.errors.NotFound:
         pass
+
+    running_workers = client.containers.list(
+        filters={"name": "devintel_engine_"}
+    )
+    worker_limit = settings.MAX_AUDIT_WORKERS
+    if len(running_workers) >= worker_limit:
+        raise WorkerLimitReachedError(
+            "Worker limit reached "
+            f"({len(running_workers)}/{worker_limit}). "
+            "Try again when a running audit completes."
+        )
 
     logger.info("Spawning container %s for repo %s", container_name, repo_url)
     client.containers.run(
@@ -108,6 +123,8 @@ async def start_audit(repository_id: str, force: bool, db: AsyncSession) -> dict
         await asyncio.to_thread(
             _ensure_container_running, repo.repo_url, repository_id, commit_hash
         )
+    except WorkerLimitReachedError:
+        raise
     except Exception as e:
         logger.exception("Failed to spawn worker container for repository %s", repository_id)
         raise ValueError(f"Failed to start audit worker: {e}") from e

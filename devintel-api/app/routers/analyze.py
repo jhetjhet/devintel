@@ -7,7 +7,7 @@ from schemas.analysis import AnalysisRunSummary, AnalysisRunDetail
 from services.repository_service import analyze_repository, get_repository_by_id
 from services.analysis_service import process_analysis_result, get_analysis_status
 from services.report_service import list_analysis_runs, get_analysis_run_detail, get_analysis_run_detail_by_id
-from services.audit_service import start_audit
+from services.audit_service import start_audit, WorkerLimitReachedError
 
 router = APIRouter()
 
@@ -20,6 +20,8 @@ async def trigger_audit(request: AuditRequest, db: AsyncSession = Depends(get_db
             repository_id=result["repository_id"],
             commit_hash=result["commit_hash"],
         )
+    except WorkerLimitReachedError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
