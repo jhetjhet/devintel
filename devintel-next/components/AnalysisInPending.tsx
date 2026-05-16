@@ -6,6 +6,7 @@ import { AlertCircle, Zap, RotateCw, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { finalizeAnalysis, startAudit } from "@/app/actions/evaluate";
+import { Button } from "./ui/button";
 
 interface AnalysisInProgressProps {
   repositoryId: string;
@@ -17,8 +18,9 @@ export function AnalysisInPending({
   commitHash,
 }: AnalysisInProgressProps) {
   const router = useRouter();
-  
-  const [finalizeAnalysisIsPending, startFinalizeAnalysisTransition] = useTransition();
+
+  const [finalizeAnalysisIsPending, startFinalizeAnalysisTransition] =
+    useTransition();
   const [auditIsPending, startAuditTransition] = useTransition();
 
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +32,28 @@ export function AnalysisInPending({
       if (!response.success) {
         setError(response.error.message);
       } else {
-        router.push(`/dashboard/${response.data.repository_id}?analysis_run_id=${response.data.analysis_run_id}`);
+        router.push(
+          `/dashboard/${response.data.repository_id}?analysis_run_id=${response.data.analysis_run_id}`,
+        );
       }
     });
   };
 
+  const handleStartAudit = () => {
+    startAuditTransition(async () => {
+      const respose = await startAudit(repositoryId, true);
+
+      if (!respose.success) {
+        console.error("Failed to start audit:", respose.error);
+        return;
+      }
+
+      router.push(`/analysis/${respose.data?.repository_id}/progress`);
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-[#05070d] flex items-center justify-center p-6 md:p-12">
+    <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6 md:p-12">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -71,7 +88,7 @@ export function AnalysisInPending({
         </div>
 
         {/* Info box */}
-        <div className="p-5 bg-[#0f172a] border border-warning/20 rounded-2xl mb-6 space-y-3">
+        <div className="p-5 bg-[var(--color-surface)] border border-warning/20 rounded-2xl mb-6 space-y-3">
           <div className="flex items-center gap-2 mb-3">
             <AlertCircle size={14} className="text-warning shrink-0" />
             <span className="text-xs font-mono text-warning uppercase tracking-widest">
@@ -115,37 +132,31 @@ export function AnalysisInPending({
 
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            disabled={finalizeAnalysisIsPending || auditIsPending}
             onClick={handleFinalize}
-            disabled={finalizeAnalysisIsPending}
-            className="flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold text-sm rounded-xl transition-all duration-200 group"
           >
-            <Zap size={16} className={finalizeAnalysisIsPending ? "animate-pulse" : ""} />
+            <Zap
+              size={16}
+              className={finalizeAnalysisIsPending ? "animate-pulse" : ""}
+            />
             {finalizeAnalysisIsPending ? "Finalizing..." : "Finalize Results"}
-          </button>
+          </Button>
 
-          <button
-            onClick={() => {
-              startAuditTransition(async () => {
-                const respose = await startAudit(repositoryId, true);
-                
-                if (!respose.success) {
-                  console.error("Failed to start audit:", respose.error);
-                  return;
-                }
-
-                router.push(`/analysis/${respose.data?.repository_id}/progress`);
-              });
-            }}
-            disabled={finalizeAnalysisIsPending}
-            className="flex items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors"
+          <Button
+            variant="ghost"
+            size="md"
+            disabled={auditIsPending}
+            onClick={handleStartAudit}
           >
             <RotateCw size={16} />
             Run Again
-          </button>
+          </Button>
         </div>
 
-        <p className="text-[11px] text-white/20 text-center mt-5 leading-relaxed">
+        <p className="text-[12px] text-white/20 text-center mt-5 leading-relaxed">
           Running analysis again will start fresh — the current cached result
           will remain available until it expires.
         </p>

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useTransition } from "react";
 import { startAudit } from "@/app/actions/evaluate";
 import { AnalysisStatusResponse } from "@/types/repository";
+import { Button } from "./ui/button";
 
 type AnalysisCompletedProps = {
   analysisStatus: AnalysisStatusResponse;
@@ -18,7 +19,7 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
   const [auditIsPending, startAuditTransition] = useTransition();
 
   return (
-    <div className="min-h-screen bg-[#05070d] flex items-center justify-center p-6 md:p-12">
+    <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6 md:p-12">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -53,7 +54,7 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
         </div>
 
         {/* Info box */}
-        <div className="p-5 bg-[#0f172a] border border-secondary/20 rounded-2xl mb-6 space-y-3">
+        <div className="p-5 bg-[var(--color-surface)] border border-secondary/20 rounded-2xl mb-6 space-y-3">
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle2 size={14} className="text-secondary shrink-0" />
             <span className="text-xs font-mono text-secondary uppercase tracking-widest">
@@ -77,10 +78,10 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
           <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-3 text-xs font-mono">
             <div>
               <span className="text-white/20 uppercase tracking-widest block mb-0.5">
-                Repository
+                Same-Commit Runs
               </span>
               <span className="text-white/60">
-                {analysisStatus.repository_id.slice(0, 8)}...
+                {analysisStatus.analysis_run_count}
               </span>
             </div>
             <div>
@@ -104,7 +105,9 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
             View Report
           </Link>
 
-          <button
+          <Button
+            variant="ghost"
+            size="md"
             disabled={auditIsPending}
             onClick={() => {
               startAuditTransition(async () => {
@@ -123,14 +126,13 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
                 );
               });
             }}
-            className="flex cursor-pointer items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl border border-white/10 transition-colors disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-white/30 disabled:border-white/5"
           >
             <RotateCw size={16} />
             {auditIsPending ? "Running New Analysis..." : "Run New Analysis"}
-          </button>
+          </Button>
         </div>
 
-        <p className="text-[11px] text-white/20 text-center mt-5 leading-relaxed">
+        <p className="text-[12px] text-white/20 text-center mt-5 leading-relaxed">
           Running analysis again will only apply if there is a new commit.
           Historical reports are preserved for comparison.
         </p>
