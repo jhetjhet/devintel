@@ -54,9 +54,11 @@ export type AppError = {
 export type FetchResponse<T> = {
     success: true;
     data: T;
+    status: number;
 } | {
     success: false;
     error: AppError;
+    status: number;
 }
 
 export type FastApiError = z.infer<typeof FastApiErrorSchema>;

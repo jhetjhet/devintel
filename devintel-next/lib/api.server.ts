@@ -9,6 +9,7 @@ export async function fetchAnalysisStatus(
 ): Promise<AnalysisStatusResponse> {
   const data = await typedFetch<AnalysisStatusResponse>(
     `${process.env.API_ENDPOINT}/api/analysis/${id}/status/`,
+    { cache: "no-store" },
   );
 
   const dataRes = AnalysisStatusResponseSchema.safeParse(data);

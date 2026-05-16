@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { motion } from "motion/react";
 import { AlertCircle, Zap, RotateCw, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { finalizeAnalysis, startAudit } from "@/app/actions/evaluate";
+import { finalizeAnalysis } from "@/app/actions/evaluate";
 import { Button } from "./ui/button";
+import useAudit from "@/hooks/useAudit";
 
 interface AnalysisInProgressProps {
   repositoryId: string;
@@ -21,9 +22,15 @@ export function AnalysisInPending({
 
   const [finalizeAnalysisIsPending, startFinalizeAnalysisTransition] =
     useTransition();
-  const [auditIsPending, startAuditTransition] = useTransition();
 
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    error: auditError,
+    auditIsPending,
+    analysisRes,
+    initiateAudit,
+  } = useAudit();
 
   const handleFinalize = () => {
     startFinalizeAnalysisTransition(async () => {
@@ -33,24 +40,21 @@ export function AnalysisInPending({
         setError(response.error.message);
       } else {
         router.push(
-          `/dashboard/${response.data.repository_id}?analysis_run_id=${response.data.analysis_run_id}`,
+          `/dashboard/${response.data.repository_id}/${response.data.analysis_run_id}`,
         );
       }
     });
   };
 
-  const handleStartAudit = () => {
-    startAuditTransition(async () => {
-      const respose = await startAudit(repositoryId, true);
+  useEffect(() => {
+    if (!analysisRes) return;
 
-      if (!respose.success) {
-        console.error("Failed to start audit:", respose.error);
-        return;
-      }
+    router.push(`/analysis/${analysisRes.repository_id}/progress`);
+  }, [analysisRes]);
 
-      router.push(`/analysis/${respose.data?.repository_id}/progress`);
-    });
-  };
+  useEffect(() => {
+    setError(auditError);
+  }, [auditError]);
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6 md:p-12">
@@ -149,7 +153,7 @@ export function AnalysisInPending({
             variant="ghost"
             size="md"
             disabled={auditIsPending}
-            onClick={handleStartAudit}
+            onClick={() => initiateAudit(repositoryId, true)}
           >
             <RotateCw size={16} />
             Run Again

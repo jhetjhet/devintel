@@ -1,7 +1,6 @@
 "use server";
 
 import { AnalaysisCompleteResponseSchema, AnalysisCompleteResponse, FetchResponse, Repository } from "@/types/api";
-import { redirect } from "next/navigation";
 
 export const analyzeRepo = async (repo_url: string): Promise<FetchResponse<Repository>> => {
     try {
@@ -18,15 +17,15 @@ export const analyzeRepo = async (repo_url: string): Promise<FetchResponse<Repos
         if (!response.ok) {
             const errorData = await response.json();
 
-            return { success: false, error: { message: errorData?.detail, raw: errorData } };
+            return { success: false, error: { message: errorData?.detail, raw: errorData }, status: response.status };
         }
 
         const responseData = await response.json();
 
-        return { success: true, data: responseData };
+        return { success: true, data: responseData, status: response.status };
     } catch (error) {
         console.error("Unexpected Error:", error);
-        return { success: false, error: { message: "An unexpected error occurred.", raw: error } };
+        return { success: false, error: { message: "An unexpected error occurred.", raw: error }, status: 500 };
     }
 }
 
@@ -38,19 +37,19 @@ export const finalizeAnalysis = async (repositoryId: string): Promise<FetchRespo
 
         if (!response.ok) {
             const errorData = await response.json();
-            return { success: false, error: { message: errorData?.detail, raw: errorData } };
+            return { success: false, error: { message: errorData?.detail, raw: errorData }, status: response.status };
         }
 
         const dataRes = AnalaysisCompleteResponseSchema.safeParse(await response.json());
 
         if (!dataRes.success) {
-            return { success: false, error: { message: "Invalid response format", raw: dataRes.error } };
+            return { success: false, error: { message: "Invalid response format", raw: dataRes.error }, status: response.status };
         }
 
-        return { success: true, data: dataRes.data };
+        return { success: true, data: dataRes.data, status: response.status };
     } catch (error) {
         console.error("Unexpected Error:", error);
-        return { success: false, error: { message: "An unexpected error occurred.", raw: error } };
+        return { success: false, error: { message: "An unexpected error occurred.", raw: error }, status: 500 };
     }
 }
 
@@ -68,18 +67,18 @@ export const startAudit = async (repository_id: string, force: boolean = false):
 
         if (!response.ok) {
             const errorData = await response.json();
-            return { success: false, error: { message: errorData?.detail, raw: errorData } };
+            return { success: false, error: { message: errorData?.detail, raw: errorData }, status: response.status };
         }
 
         const dataRes = AnalaysisCompleteResponseSchema.omit({ analysis_run_id: true }).safeParse(await response.json());
 
         if (!dataRes.success) {
-            return { success: false, error: { message: "Invalid response format", raw: dataRes.error } };
+            return { success: false, error: { message: "Invalid response format", raw: dataRes.error }, status: response.status };
         }
 
-        return { success: true, data: dataRes.data };
+        return { success: true, data: dataRes.data, status: response.status };
     } catch (error) {
         console.error("Unexpected Error:", error);
-        return { success: false, error: { message: "An unexpected error occurred.", raw: error } };
+        return { success: false, error: { message: "An unexpected error occurred.", raw: error }, status: 500 };
     }
 }
