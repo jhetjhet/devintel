@@ -31,7 +31,35 @@ def parse_location(location: str) -> tuple[str | None, int | None]:
     return location, None
 
 
-async def persist_analysis_result(db: AsyncSession, repo: Repository, report: dict) -> AnalysisRun:
+def _parse_metadata_datetime(value: object) -> datetime | None:
+    if isinstance(value, datetime):
+        return value
+    if not isinstance(value, str) or not value:
+        return None
+
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        return datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+
+
+def _parse_metadata_int(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.isdigit():
+        return int(value)
+    return None
+
+
+async def persist_analysis_result(
+    db: AsyncSession,
+    repo: Repository,
+    report: dict,
+    metadata: dict | None = None,
+) -> AnalysisRun:
     """
     Map a completed agent report dict into the relational schema and commit
     everything in a single transaction.
@@ -47,6 +75,7 @@ async def persist_analysis_result(db: AsyncSession, repo: Repository, report: di
     finding_summary = det.get("finding_summary", {})
     security_audit = det.get("security_audit", {})
     now = datetime.now(timezone.utc)
+    metadata = metadata if isinstance(metadata, dict) else None
 
     # ── analysis_runs ─────────────────────────────────────────────────────────
     run = AnalysisRun(
@@ -71,6 +100,11 @@ async def persist_analysis_result(db: AsyncSession, repo: Repository, report: di
         security_high_count=security_audit.get("high_count"),
         security_medium_count=security_audit.get("medium_count"),
         security_low_count=security_audit.get("low_count"),
+        duration_ms=_parse_metadata_int(metadata.get("duration_ms")) if metadata else None,
+        started_at=_parse_metadata_datetime(metadata.get("started_at")) if metadata else None,
+        completed_at=_parse_metadata_datetime(metadata.get("completed_at")) if metadata else None,
+        with_llm=metadata.get("with_llm") if metadata and isinstance(metadata.get("with_llm"), bool) else None,
+        metadata_snapshot=metadata,
         scanned_at=now,
         full_audit_report=report,
     )

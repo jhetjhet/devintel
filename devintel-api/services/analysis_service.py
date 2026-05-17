@@ -5,7 +5,12 @@ from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Repository, AnalysisRun
-from services.redis_service import get_analysis_result, get_analysis_status_key, delete_analysis_keys
+from services.redis_service import (
+    get_analysis_result,
+    get_analysis_status_key,
+    get_analysis_metadata,
+    delete_analysis_keys,
+)
 from utils.analysis_persist import persist_analysis_result
 
 
@@ -42,7 +47,8 @@ async def process_analysis_result(repository_id: str, db: AsyncSession) -> dict:
 
     # The agent wraps the report under "full_audit_report"
     report = data.get("full_audit_report", data)
-    analysis_run = await persist_analysis_result(db, repo, report)
+    metadata = await get_analysis_metadata(repository_id, commit_hash)
+    analysis_run = await persist_analysis_result(db, repo, report, metadata=metadata)
 
     # Delete all Redis keys for this repo+commit to prevent stale data
     await delete_analysis_keys(repository_id, commit_hash)
@@ -97,6 +103,34 @@ async def get_analysis_status(repository_id: str, db: AsyncSession) -> dict:
     analysis_run_count = count_result.scalar() or 0
 
     def _serialize_run(run: AnalysisRun) -> dict:
+        print('-' * 20)
+        # print json run
+        print(json.dumps({
+            "id": str(run.id),
+            "job_id": run.job_id,
+            "commit_hash": run.commit_hash,
+            "branch": run.branch,
+            "repo_name": run.repo_name,
+            "overall_score": run.overall_score,
+            "technical_debt_score": run.technical_debt_score,
+            "overall_verdict": run.overall_verdict,
+            "confidence": run.confidence,
+            "total_findings": run.total_findings,
+            "total_smells": run.total_smells,
+            "security_critical_count": run.security_critical_count,
+            "security_high_count": run.security_high_count,
+            "security_medium_count": run.security_medium_count,
+            "security_low_count": run.security_low_count,
+            "duration_ms": run.duration_ms,
+            "started_at": run.started_at.isoformat() if run.started_at else None,
+            "completed_at": run.completed_at.isoformat() if run.completed_at else None,
+            "with_llm": run.with_llm,
+            "metadata_snapshot": run.metadata_snapshot,
+            "scanned_at": run.scanned_at.isoformat() if run.scanned_at else None,
+            "created_at": run.created_at.isoformat(),
+        }, indent=2))
+        print('-' * 20)
+
         return {
             "id": str(run.id),
             "job_id": run.job_id,
@@ -113,6 +147,11 @@ async def get_analysis_status(repository_id: str, db: AsyncSession) -> dict:
             "security_high_count": run.security_high_count,
             "security_medium_count": run.security_medium_count,
             "security_low_count": run.security_low_count,
+            "duration_ms": run.duration_ms,
+            "started_at": run.started_at.isoformat() if run.started_at else None,
+            "completed_at": run.completed_at.isoformat() if run.completed_at else None,
+            "with_llm": run.with_llm,
+            "metadata_snapshot": run.metadata_snapshot,
             "scanned_at": run.scanned_at.isoformat() if run.scanned_at else None,
             "created_at": run.created_at.isoformat(),
         }

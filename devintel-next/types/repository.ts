@@ -92,6 +92,24 @@ export const AnalysisDependencySchema = z.object({
 // Scalar groups — composed into AnalysisRun schemas
 // ---------------------------------------------------------------------------
 
+export const AnalysisRunMetadataSchema = z.object({
+  "job_id": z.string(),
+  "repo_url": z.string(),
+  "commit_hash": z.string(),
+  "commit_hash_source": z.string(),
+  "channel": z.string(),
+  "started_at": z.string(),
+  "updated_at": z.string(),
+  "expires_at": z.string(),
+  "ttl_seconds": z.number(),
+  "status": z.string(),
+  "with_llm": z.boolean(),
+  "llm_mode": z.string(),
+  "terminal_published": z.boolean(),
+  "completed_at": z.string(),
+  "duration_ms": z.number()
+});
+
 const AnalysisRunBaseSchema = z.object({
   id: z.string(),
   job_id: z.string(),
@@ -116,6 +134,11 @@ const LLMScalarsSchema = z.object({
   confidence: z.number().nullable(),
   growth_pts: z.number().nullable(),
   ai_reasoning: z.string().nullable(),
+  duration_ms: z.number().nullable(),
+  started_at: z.string().nullable(),
+  completed_at: z.string().nullable(),
+  with_llm: z.boolean().nullable(),
+  metadata_snapshot: AnalysisRunMetadataSchema.nullable(),
 });
 
 const SecurityCountsSchema = z.object({
@@ -159,6 +182,10 @@ export const PartialAnalysisRunSummarySchema =
     security_low_count: true,
     scanned_at: true,
     created_at: true,
+    duration_ms: true,
+    started_at: true,
+    completed_at: true,
+    with_llm: true,
   });
 
 export const AnalysisRunDetailSchema = AnalysisRunSummarySchema.merge(
