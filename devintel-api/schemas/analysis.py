@@ -37,6 +37,11 @@ class AnalysisRunSummary(BaseModel):
     security_high_count: int | None
     security_medium_count: int | None
     security_low_count: int | None
+    duration_ms: int | None
+    started_at: datetime | None
+    completed_at: datetime | None
+    with_llm: bool | None
+    metadata_snapshot: dict | None
     scanned_at: datetime | None
     created_at: datetime
 
@@ -63,6 +68,11 @@ class AnalysisRunDetail(BaseModel):
     security_high_count: int | None
     security_medium_count: int | None
     security_low_count: int | None
+    duration_ms: int | None
+    started_at: datetime | None
+    completed_at: datetime | None
+    with_llm: bool | None
+    metadata_snapshot: dict | None
     scanned_at: datetime | None
     created_at: datetime
     radar_metrics: list[RadarMetricOut]

@@ -1,4 +1,5 @@
 import redis.asyncio as aioredis
+import json
 
 from app.config import settings
 
@@ -18,6 +19,21 @@ async def get_analysis_status_key(repository_id: str, commit_hash: str) -> str |
     try:
         value = await r.get(f"devintel:{repository_id}:{commit_hash}:status")
         return value.decode() if value is not None else None
+    finally:
+        await r.aclose()
+
+
+async def get_analysis_metadata(repository_id: str, commit_hash: str) -> dict | None:
+    """Fetch analysis metadata JSON from Redis for a given repo and commit."""
+    r = aioredis.from_url(settings.REDIS_URL)
+    try:
+        value = await r.get(f"devintel:{repository_id}:{commit_hash}:metadata")
+        if value is None:
+            return None
+        try:
+            return json.loads(value)
+        except (TypeError, json.JSONDecodeError):
+            return None
     finally:
         await r.aclose()
 

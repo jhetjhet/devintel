@@ -11,3 +11,4 @@ python-socketio[client]==5.12.1
 requests==2.32.3
 aiohttp>=3.9.0
 GitPython>=3.1.50
+alembic==1.14.0

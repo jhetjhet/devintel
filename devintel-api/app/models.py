@@ -65,6 +65,11 @@ class AnalysisRun(Base):
     security_high_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     security_medium_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     security_low_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    with_llm: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    metadata_snapshot: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
 
     scanned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
