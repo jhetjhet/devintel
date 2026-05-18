@@ -16,7 +16,7 @@ export default async function AnalysisProgressPage({
   const { id } = await params;
 
   const analysisStatus = await fetchAnalysisStatus(id);
-
+console.log("Fetched analysis status:", analysisStatus);
   if (!analysisStatus.analysis_status || analysisStatus.analysis_status === "completed" || analysisStatus.has_pending_result) {
     redirect(`/analysis/${id}`);
   }

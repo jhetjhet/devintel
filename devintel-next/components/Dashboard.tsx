@@ -20,6 +20,7 @@ import {
   RepositoryDetails,
 } from "@/types/repository";
 import useSWR from "swr";
+import { AuthUser } from "@/types/auth";
 
 async function fetchReporsts(
   repositoryId: string,
@@ -49,11 +50,12 @@ async function fetchReporsts(
 }
 
 type DashboardProps = {
+  user: AuthUser | null;
   repositoryDetails: RepositoryDetails;
   reportDetails: AnalysisRunDetail;
 };
 
-export function Dashboard({ repositoryDetails, reportDetails }: DashboardProps) {
+export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardProps) {
   const [selectedRefactor, setSelectedRefactor] = useState(0);
   const [activeMetric, setActiveMetric] = useState<"debt" | "score">("score");
 
@@ -93,7 +95,7 @@ export function Dashboard({ repositoryDetails, reportDetails }: DashboardProps) 
     : null;
 
   return (
-    <div className="min-h-screen bg-surface p-6 md:p-12">
+    <div className="min-h-screen bg-surface p-6 pt-20 md:p-12 md:pt-20">
       <div className="max-w-7xl mx-auto">
         <Header
           repositoryDetails={repositoryDetails}
