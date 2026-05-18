@@ -1,4 +1,5 @@
 import { Dashboard } from "@/components/Dashboard";
+import { fetchUserInfo } from "@/lib/api.server";
 import { AnalysisRunDetail, AnalysisRunDetailSchema, RepositoryDetails, RepositoryDetailsSchema } from "@/types/repository";
 
 type DashboardPageProps = {
@@ -47,11 +48,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const repoDetail = await fetchRepoDetail(repo_id);
   const reportData = await fetchReportData(repo_id, analysis_run_id || "latest");
-console.log("Fetched repository detail:", repoDetail);
+  const user = await fetchUserInfo();
+
   return (
     <Dashboard 
       repositoryDetails={repoDetail}
       reportDetails={reportData} 
+      user={user}
     />
   );
 }

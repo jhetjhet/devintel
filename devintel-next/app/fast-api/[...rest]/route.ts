@@ -1,3 +1,4 @@
+import authFetch from "@/lib/auth-fetch";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -17,7 +18,7 @@ export async function GET(
       url.searchParams.set(key, value);
     });
 
-    const response = await fetch(url.toString());
+    const response = await authFetch(url.toString());
 
     if (!response.ok) {
       const errorData = await response.text();

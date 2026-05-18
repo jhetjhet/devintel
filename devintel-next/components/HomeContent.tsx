@@ -8,6 +8,7 @@ import { analyzeRepo } from "@/app/actions/evaluate";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { AuthUser } from "@/types/auth";
 
 const GithubIcon = () => (
   <svg
@@ -24,7 +25,11 @@ const GithubIcon = () => (
   </svg>
 );
 
-export default function HomeContent() {
+type HomeContentProps = {
+  user: AuthUser | null;
+};
+
+export default function HomeContent({ user }: HomeContentProps) {
   const router = useRouter();
 
   const [repoUrl, setRepoUrl] = useState("");

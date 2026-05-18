@@ -17,6 +17,8 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 
   const analysisStatus = await fetchAnalysisStatus(id);
 
+  console.log("Fetched analysis status:", analysisStatus);
+
   if (!analysisStatus.recent_analysis_run) {
     const response = await startAudit(id);
 
