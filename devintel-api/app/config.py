@@ -4,6 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     DATABASE_URL: str
     REDIS_URL: str = "redis://redis:6379"
+    JWT_SECRET_KEY: str = "change-this-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 1
+    JWT_ISSUER: str = "devintel-api"
+    JWT_AUDIENCE: str = "devintel-client"
 
     LLM_API_KEY: str
     LLM_MODEL: str = "deepseek-coder"
