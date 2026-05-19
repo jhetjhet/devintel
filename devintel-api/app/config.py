@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     LLM_BASE_URL: str = "https://api.deepseek.com"
     DEVINTEL_ENGINE_IMAGE: str = "devintel_engine"
     MAX_AUDIT_WORKERS: int = 5
+    ADMIN_USERNAME: str | None = None
+    ADMIN_PASSWORD: str | None = None
+    ADMIN_SECRET_KEY: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
