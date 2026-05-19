@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "./dashboard/Header";
-import { OverviewMetrics } from "./dashboard/OverviewMetrics";
 import { QuickWins } from "./dashboard/QuickWins";
 import { FileStructure } from "./dashboard/FileStructure";
 import { SecurityAudit } from "./dashboard/SecurityAudit";
@@ -19,12 +18,17 @@ import {
 } from "@/types/repository";
 import { AuthUser } from "@/types/auth";
 import GrowthReportContainer from "./dashboard/GrowthReportContainer";
+import HealthScoreCard from "./dashboard/HealthScoreCard";
+import RadarMetricsCard from "./dashboard/RadarMetricsCard";
+import { LLMDisabledNotice } from "./dashboard/LLMDisabledNotice";
 
 async function fetchReporsts(
   repositoryId: string,
 ): Promise<AnalysisRunSummary[]> {
   try {
-    const response = await fetch(`/fast-api/repositories/${repositoryId}/reports/`);
+    const response = await fetch(
+      `/fast-api/repositories/${repositoryId}/reports/`,
+    );
 
     if (!response.ok) {
       console.error("Failed to fetch reports:", await response.text());
@@ -53,13 +57,16 @@ type DashboardProps = {
   reportDetails: AnalysisRunDetail;
 };
 
-export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardProps) {
+export function Dashboard({
+  user,
+  repositoryDetails,
+  reportDetails,
+}: DashboardProps) {
   const [selectedRefactor, setSelectedRefactor] = useState(0);
 
   const showGrowthReport = user && repositoryDetails.user_id === user.id;
-
-  const currentRefactor =
-    reportDetails.refactor_suggestions[selectedRefactor];
+  console.log("reportDetails:", reportDetails);
+  const currentRefactor = reportDetails.refactor_suggestions[selectedRefactor];
   const refactorDiff = currentRefactor
     ? {
         header: currentRefactor.title ?? "Refactor Suggestion",
@@ -96,14 +103,15 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
           </TabsList>
 
           <TabsContent value="structured_report" className="mt-6">
+            <LLMDisabledNotice with_llm={reportDetails.with_llm} />
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-              <OverviewMetrics
+              <HealthScoreCard
                 overall_score={reportDetails.overall_score}
                 technical_debt_score={reportDetails.technical_debt_score}
                 confidence={reportDetails.confidence}
                 total_findings={reportDetails.total_findings}
-                radar_metrics={reportDetails.radar_metrics}
               />
+              <RadarMetricsCard radar_metrics={reportDetails.radar_metrics} />
             </div>
 
             {/* Score & Debt over time */}
@@ -139,9 +147,7 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
                 <TabsTrigger
                   value="security"
                   className="data-active:bg-primary data-active:text-white"
-                  disabled={
-                    reportDetails.security_vulnerabilities.length === 0
-                  }
+                  disabled={reportDetails.security_vulnerabilities.length === 0}
                 >
                   Security Audit
                 </TabsTrigger>
@@ -187,9 +193,7 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
                       reportDetails.security_critical_count
                     }
                     security_high_count={reportDetails.security_high_count}
-                    security_medium_count={
-                      reportDetails.security_medium_count
-                    }
+                    security_medium_count={reportDetails.security_medium_count}
                     security_low_count={reportDetails.security_low_count}
                   />
                 )}
@@ -202,7 +206,6 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
               <GrowthReportContainer repositoryId={repositoryDetails.id} />
             </TabsContent>
           )}
-
         </Tabs>
       </div>
     </div>

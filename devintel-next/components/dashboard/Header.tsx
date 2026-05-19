@@ -50,13 +50,13 @@ export function Header({ repositoryDetails, reportDetails }: HeaderProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-full md:w-auto">
         <Link
           href="/"
           className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-white/50 hover:text-primary text-xs font-mono font-bold uppercase tracking-widest transition-all"
         >
           <Plus size={12} />
-          Run New Audit
+          CREATE NEW REPORT
         </Link>
         {reportDetails.overall_verdict && (
           <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-bold uppercase">
@@ -64,7 +64,7 @@ export function Header({ repositoryDetails, reportDetails }: HeaderProps) {
           </span>
         )}
         {reportDetails.overall_score !== null && (
-          <div className="text-right">
+          <div className="text-right ml-auto">
             <div className="text-3xl font-black text-white">
               {reportDetails.overall_score}
             </div>
