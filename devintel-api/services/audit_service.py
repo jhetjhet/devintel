@@ -4,12 +4,13 @@ import uuid
 
 import docker
 import docker.errors
-import redis.asyncio as aioredis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.models import Repository, AnalysisRun
+from app.models import AnalysisRun
+from services.redis_service import delete_analysis_keys, initialize_analysis_job
+from services.repository_service import get_repository_record_by_id
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +23,13 @@ class WorkerLimitReachedError(Exception):
 # Docker helpers (sync — called via asyncio.to_thread)
 # ---------------------------------------------------------------------------
 
-def _ensure_container_running(repo_url: str, repository_id: str, commit_hash: str) -> None:
+def _ensure_container_running(job_id: str) -> None:
     """
     Checks whether a worker container for this repository is already running.
     Spawns one if not. Cleans up stopped/exited containers with the same name
     before re-spawning to avoid name conflicts.
     """
-    container_name = f"devintel_engine_{repository_id}"
+    container_name = f"devintel_engine_{job_id}"
     client = docker.from_env()
 
     try:
@@ -53,11 +54,11 @@ def _ensure_container_running(repo_url: str, repository_id: str, commit_hash: st
             "Try again when a running audit completes."
         )
 
-    logger.info("Spawning container %s for repo %s", container_name, repo_url)
+    logger.info("Spawning container %s", container_name)
     client.containers.run(
         image=settings.DEVINTEL_ENGINE_IMAGE,
         name=container_name,
-        command=["python3", "/app/orchestrator.py", repo_url, repository_id, commit_hash],
+        command=["python3", "/app/orchestrator.py", job_id],
         environment={
             "LLM_API_KEY": settings.LLM_API_KEY,
             "LLM_MODEL": settings.LLM_MODEL,
@@ -75,7 +76,12 @@ def _ensure_container_running(repo_url: str, repository_id: str, commit_hash: st
 # Audit orchestration
 # ---------------------------------------------------------------------------
 
-async def start_audit(repository_id: str, force: bool, db: AsyncSession) -> dict:
+async def start_audit(
+    repository_id: str,
+    force: bool,
+    user_id: str | uuid.UUID,
+    db: AsyncSession,
+) -> dict:
     """
     Validate audit constraints for the given repository, then spawn the
     worker container.
@@ -88,27 +94,26 @@ async def start_audit(repository_id: str, force: bool, db: AsyncSession) -> dict
                     exists for the current commit (when force=False), or the
                     container fails to start.
     """
-    try:
-        repository_uuid = uuid.UUID(repository_id)
-    except ValueError:
-        raise ValueError(f"Invalid repository ID: {repository_id}")
+    if isinstance(user_id, str):
+        try:
+            user_uuid = uuid.UUID(user_id)
+        except ValueError as exc:
+            raise ValueError("Invalid user ID format.") from exc
+    else:
+        user_uuid = user_id
 
-    result = await db.execute(
-        select(Repository).where(Repository.id == repository_uuid)
-    )
-    repo = result.scalar_one_or_none()
-
-    if not repo:
-        raise ValueError(f"Repository {repository_id} not found.")
+    repo = await get_repository_record_by_id(repository_id, db, user_id=user_uuid)
 
     commit_hash = repo.latest_commit_hash or ""
-    repository_id = str(repository_uuid)  # normalised string form
+    repository_id = str(repo.id)
+    job_id = str(uuid.uuid4())
 
     # Guard: skip spawn if analysis already exists for this commit (unless forced)
     if not force:
         existing = await db.execute(
             select(AnalysisRun).where(
-                AnalysisRun.repository_id == repository_uuid,
+                AnalysisRun.repository_id == repo.id,
+                AnalysisRun.user_id == user_uuid,
                 AnalysisRun.commit_hash == commit_hash,
             )
         )
@@ -118,36 +123,59 @@ async def start_audit(repository_id: str, force: bool, db: AsyncSession) -> dict
                 f"at commit {commit_hash}. Pass force=true to re-analyze."
             )
 
+    metadata = {
+        "commit_hash": commit_hash,
+        "user_id": str(user_uuid),
+        "repo_url": repo.repo_url,
+        "with_llm": True,
+    }
+
+    try:
+        await initialize_analysis_job(job_id, metadata)
+    except Exception as exc:
+        logger.exception("Failed to initialize Redis state for job %s", job_id)
+        raise ValueError(f"Failed to initialize audit state: {exc}") from exc
+
+    analysis_run = AnalysisRun(
+        repository_id=repo.id,
+        user_id=user_uuid,
+        commit_hash=commit_hash,
+        job_id=job_id,
+    )
+
+    try:
+        db.add(analysis_run)
+        await db.commit()
+        await db.refresh(analysis_run)
+    except Exception as exc:
+        await db.rollback()
+        await delete_analysis_keys(job_id)
+        raise ValueError(f"Failed to create analysis run: {exc}") from exc
+
     # Spawn worker container (blocking Docker call — run in thread pool)
     try:
-        await asyncio.to_thread(
-            _ensure_container_running, repo.repo_url, repository_id, commit_hash
-        )
+        await asyncio.to_thread(_ensure_container_running, job_id)
     except WorkerLimitReachedError:
+        await delete_analysis_keys(job_id)
+        await db.delete(analysis_run)
+        await db.commit()
         raise
     except Exception as e:
-        logger.exception("Failed to spawn worker container for repository %s", repository_id)
+        logger.exception("Failed to spawn worker container for job %s", job_id)
+        await delete_analysis_keys(job_id)
+        await db.delete(analysis_run)
+        await db.commit()
         raise ValueError(f"Failed to start audit worker: {e}") from e
 
-    logger.info("Audit worker started for repository %s at commit %s", repository_id, commit_hash)
-
-    # Mark audit as in-progress in Redis (TTL: 1 hour as a stale-entry safeguard)
-    try:
-        r = aioredis.from_url(settings.REDIS_URL)
-        try:
-            base_key = f"devintel:{repository_id}:{commit_hash}"
-            await r.set(f"{base_key}:status", "progress", ex=3600)
-            await r.set(f"{base_key}:progress", 0, ex=3600)
-            await r.delete(f"{base_key}:result")
-        finally:
-            await r.aclose()
-    except Exception:
-        logger.exception(
-            "Failed to initialise Redis state for repository %s at commit %s",
-            repository_id, commit_hash,
-        )
+    logger.info(
+        "Audit worker started for repository %s at commit %s with job %s",
+        repository_id,
+        commit_hash,
+        job_id,
+    )
 
     return {
         "repository_id": repository_id,
         "commit_hash": commit_hash,
+        "job_id": job_id,
     }

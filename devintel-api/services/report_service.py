@@ -27,22 +27,23 @@ from schemas.report import (
     FileHealthEntryOut,
     AnalysisDependencyOut,
 )
+from services.repository_service import get_repository_record_by_id
 
 
-async def list_analysis_runs(repository_id: str, db: AsyncSession) -> list[AnalysisRunSummary]:
+async def list_analysis_runs(
+    repository_id: str,
+    user_id: str | uuid.UUID,
+    db: AsyncSession,
+) -> list[AnalysisRunSummary]:
     """Fetch all analysis runs for a repository."""
-    try:
-        repo_uuid = uuid.UUID(repository_id)
-    except ValueError:
-        raise ValueError("Invalid repository ID format.")
-
-    repo_result = await db.execute(select(Repository).where(Repository.id == repo_uuid))
-    if not repo_result.scalar_one_or_none():
-        raise ValueError("Repository not found.")
+    repo = await get_repository_record_by_id(repository_id, db, user_id=user_id)
 
     runs_result = await db.execute(
         select(AnalysisRun)
-        .where(AnalysisRun.repository_id == repo_uuid)
+        .where(
+            AnalysisRun.repository_id == repo.id,
+            AnalysisRun.user_id == repo.user_id,
+        )
         .order_by(AnalysisRun.scanned_at.desc())
     )
     runs = runs_result.scalars().all()
