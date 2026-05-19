@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.models import AnalysisRun
+from app.models import AnalysisRun, User
 from services.redis_service import delete_analysis_keys, initialize_analysis_job
 from services.repository_service import get_repository_record_by_id
 
@@ -104,6 +104,10 @@ async def start_audit(
 
     repo = await get_repository_record_by_id(repository_id, db, user_id=user_uuid)
 
+    user_result = await db.execute(select(User).where(User.id == user_uuid))
+    user = user_result.scalar_one_or_none()
+    ai_analysis_enabled = user.ai_analysis_enabled if user else False
+
     commit_hash = repo.latest_commit_hash or ""
     repository_id = str(repo.id)
     job_id = str(uuid.uuid4())
@@ -127,7 +131,7 @@ async def start_audit(
         "commit_hash": commit_hash,
         "user_id": str(user_uuid),
         "repo_url": repo.repo_url,
-        "with_llm": True,
+        "with_llm": ai_analysis_enabled,
     }
 
     try:

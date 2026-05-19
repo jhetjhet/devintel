@@ -68,6 +68,7 @@ class User(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ai_analysis_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
 class AnalysisRun(Base):
