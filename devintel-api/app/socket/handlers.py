@@ -5,11 +5,11 @@ import uuid
 
 import redis.asyncio as aioredis
 import socketio
-from sqlalchemy import select
+from sqlalchemy import desc, select
 
 from app.config import settings
 from app.database import AsyncSessionLocal
-from app.models import Repository
+from app.models import AnalysisRun, Repository
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,8 @@ _active_tasks: dict[str, asyncio.Task] = {}
 # Redis subscriber (async background task per connected client)
 # ---------------------------------------------------------------------------
 
-async def _redis_subscriber(sid: str, repository_id: str) -> None:
-    channel = f"devintel_engine_{repository_id}"
+async def _redis_subscriber(sid: str, job_id: str) -> None:
+    channel = f"devintel_engine_{job_id}"
     r = aioredis.from_url(settings.REDIS_URL)
 
     try:
@@ -85,10 +85,18 @@ async def on_connect(sid: str, environ: dict, auth: dict | None = None):
 
     # Confirm the repository exists in the database
     async with AsyncSessionLocal() as session:
-        result = await session.execute(
+        repo_result = await session.execute(
             select(Repository).where(Repository.id == repository_uuid)
         )
-        repo = result.scalar_one_or_none()
+        repo = repo_result.scalar_one_or_none()
+
+        run_result = await session.execute(
+            select(AnalysisRun)
+            .where(AnalysisRun.repository_id == repository_uuid)
+            .order_by(desc(AnalysisRun.created_at))
+            .limit(1)
+        )
+        recent_run = run_result.scalar_one_or_none()
 
     if not repo:
         logger.warning(
@@ -97,17 +105,18 @@ async def on_connect(sid: str, environ: dict, auth: dict | None = None):
         return False
 
     repository_id = str(repository_uuid)
-    commit_hash = repo.latest_commit_hash or ""
+    job_id = recent_run.job_id if recent_run else None
 
     # Start background task that pipes Redis messages to the client
-    task = asyncio.create_task(_redis_subscriber(sid, repository_id))
-    _active_tasks[sid] = task
+    if job_id:
+        task = asyncio.create_task(_redis_subscriber(sid, job_id))
+        _active_tasks[sid] = task
 
     # Emit current progress value so the client can resume from where it left off
     try:
         _r = aioredis.from_url(settings.REDIS_URL)
         try:
-            raw_progress = await _r.get(f"devintel:{repository_id}:{commit_hash}:progress")
+            raw_progress = await _r.get(f"devintel:{job_id}:progress") if job_id else None
             progress_value = int(raw_progress) if raw_progress is not None else 0
         finally:
             await _r.aclose()

@@ -56,6 +56,7 @@ def _parse_metadata_int(value: object) -> int | None:
 
 async def persist_analysis_result(
     db: AsyncSession,
+    analysis_run: AnalysisRun,
     repo: Repository,
     report: dict,
     metadata: dict | None = None,
@@ -67,7 +68,7 @@ async def persist_analysis_result(
     The caller is responsible for passing the unwrapped report (i.e. the value
     of ``full_audit_report`` when the agent envelope is present).
 
-    Returns the newly created :class:`AnalysisRun` instance.
+    Returns the updated :class:`AnalysisRun` instance.
     """
     det = report.get("deterministic_report", {})
     llm = report.get("llm_insights", {})
@@ -78,36 +79,37 @@ async def persist_analysis_result(
     metadata = metadata if isinstance(metadata, dict) else None
 
     # ── analysis_runs ─────────────────────────────────────────────────────────
-    run = AnalysisRun(
-        repository_id=repo.id,
-        job_id=report.get("job_id", ""),
-        commit_hash=repo_summary.get("commit_hash"),
-        branch=repo_summary.get("branch"),
-        repo_name=repo_summary.get("name"),
-        languages=repo_summary.get("languages"),
-        frameworks=repo_summary.get("frameworks"),
-        file_count=repo_summary.get("file_count"),
-        detected_pattern=repo_summary.get("detected_pattern"),
-        overall_score=llm.get("overall_score"),
-        technical_debt_score=llm.get("technical_debt_score"),
-        overall_verdict=llm.get("overall_verdict"),
-        confidence=llm.get("confidence"),
-        growth_pts=llm.get("growth_pts"),
-        ai_reasoning=llm.get("ai_reasoning"),
-        total_findings=finding_summary.get("total_findings"),
-        total_smells=finding_summary.get("total_smells"),
-        security_critical_count=security_audit.get("critical_count"),
-        security_high_count=security_audit.get("high_count"),
-        security_medium_count=security_audit.get("medium_count"),
-        security_low_count=security_audit.get("low_count"),
-        duration_ms=_parse_metadata_int(metadata.get("duration_ms")) if metadata else None,
-        started_at=_parse_metadata_datetime(metadata.get("started_at")) if metadata else None,
-        completed_at=_parse_metadata_datetime(metadata.get("completed_at")) if metadata else None,
-        with_llm=metadata.get("with_llm") if metadata and isinstance(metadata.get("with_llm"), bool) else None,
-        metadata_snapshot=metadata,
-        scanned_at=now,
-        full_audit_report=report,
-    )
+    run = analysis_run
+    run.repository_id = repo.id
+    run.user_id = repo.user_id or run.user_id
+    run.job_id = run.job_id or report.get("job_id", "")
+    run.commit_hash = repo_summary.get("commit_hash")
+    run.branch = repo_summary.get("branch")
+    run.repo_name = repo_summary.get("name")
+    run.languages = repo_summary.get("languages")
+    run.frameworks = repo_summary.get("frameworks")
+    run.file_count = repo_summary.get("file_count")
+    run.detected_pattern = repo_summary.get("detected_pattern")
+    run.overall_score = llm.get("overall_score")
+    run.technical_debt_score = llm.get("technical_debt_score")
+    run.overall_verdict = llm.get("overall_verdict")
+    run.confidence = llm.get("confidence")
+    run.growth_pts = llm.get("growth_pts")
+    run.ai_reasoning = llm.get("ai_reasoning")
+    run.total_findings = finding_summary.get("total_findings")
+    run.total_smells = finding_summary.get("total_smells")
+    run.security_critical_count = security_audit.get("critical_count")
+    run.security_high_count = security_audit.get("high_count")
+    run.security_medium_count = security_audit.get("medium_count")
+    run.security_low_count = security_audit.get("low_count")
+    run.duration_ms = _parse_metadata_int(metadata.get("duration_ms")) if metadata else None
+    run.started_at = _parse_metadata_datetime(metadata.get("started_at")) if metadata else None
+    run.completed_at = _parse_metadata_datetime(metadata.get("completed_at")) if metadata else None
+    run.with_llm = metadata.get("with_llm") if metadata and isinstance(metadata.get("with_llm"), bool) else None
+    run.metadata_snapshot = metadata
+    run.scanned_at = now
+    run.full_audit_report = report
+
     db.add(run)
     await db.flush()  # populate run.id for FK references
 

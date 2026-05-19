@@ -1,7 +1,17 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -10,11 +20,17 @@ from app.database import Base
 
 class Repository(Base):
     __tablename__ = "repositories"
+    __table_args__ = (
+        UniqueConstraint("user_id", "repo_url", name="uq_repositories_user_repo_url"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    repo_url: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
+    )
+    repo_url: Mapped[str] = mapped_column(String, nullable=False, index=True)
     provider: Mapped[str | None] = mapped_column(String, nullable=True)
     owner_name: Mapped[str | None] = mapped_column(String, nullable=True)
     repo_name: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -56,9 +72,15 @@ class User(Base):
 
 class AnalysisRun(Base):
     __tablename__ = "analysis_runs"
+    __table_args__ = (
+        Index("ix_analysis_runs_user_repository", "user_id", "repository_id"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
     )
     repository_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("repositories.id"), nullable=True

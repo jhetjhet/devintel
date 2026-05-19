@@ -1,3 +1,4 @@
+import uuid
 from urllib.parse import urlparse
 
 from sqlalchemy import select
@@ -8,10 +9,49 @@ from schemas.repository import RepositoryResponse
 from utils.repo_meta import get_repo_metadata
 
 
-async def analyze_repository(request_url: str, db: AsyncSession) -> RepositoryResponse:
+def _normalize_uuid(value: str | uuid.UUID, field_name: str) -> uuid.UUID:
+    if isinstance(value, uuid.UUID):
+        return value
+
+    try:
+        return uuid.UUID(value)
+    except ValueError as exc:
+        raise ValueError(f"Invalid {field_name} format.") from exc
+
+
+async def get_repository_record_by_id(
+    repository_id: str,
+    db: AsyncSession,
+    user_id: str | uuid.UUID | None = None,
+) -> Repository:
+    repo_uuid = _normalize_uuid(repository_id, "repository ID")
+
+    stmt = select(Repository).where(Repository.id == repo_uuid)
+    if user_id is not None:
+        stmt = stmt.where(Repository.user_id == _normalize_uuid(user_id, "user ID"))
+
+    result = await db.execute(stmt)
+    repo = result.scalar_one_or_none()
+
+    if not repo:
+        raise ValueError("Repository not found.")
+
+    return repo
+
+
+async def analyze_repository(
+    request_url: str,
+    user_id: str | uuid.UUID,
+    db: AsyncSession,
+) -> RepositoryResponse:
     """Fetch repository metadata and create/update repository record."""
+    user_uuid = _normalize_uuid(user_id, "user ID")
+
     result = await db.execute(
-        select(Repository).where(Repository.repo_url == request_url)
+        select(Repository).where(
+            Repository.repo_url == request_url,
+            Repository.user_id == user_uuid,
+        )
     )
     repo = result.scalar_one_or_none()
 
@@ -37,6 +77,7 @@ async def analyze_repository(request_url: str, db: AsyncSession) -> RepositoryRe
 
     if not repo:
         repo = Repository(
+            user_id=user_uuid,
             repo_url=request_url,
             provider=provider,
             owner_name=owner_name,
@@ -62,22 +103,12 @@ async def analyze_repository(request_url: str, db: AsyncSession) -> RepositoryRe
     )
 
 
-async def get_repository_by_id(repository_id: str, db: AsyncSession) -> RepositoryResponse:
+async def get_repository_by_id(
+    repository_id: str,
+    db: AsyncSession,
+) -> RepositoryResponse:
     """Fetch repository by ID."""
-    import uuid
-
-    try:
-        repo_uuid = uuid.UUID(repository_id)
-    except ValueError:
-        raise ValueError("Invalid repository ID format.")
-
-    result = await db.execute(
-        select(Repository).where(Repository.id == repo_uuid)
-    )
-    repo = result.scalar_one_or_none()
-
-    if not repo:
-        raise ValueError("Repository not found.")
+    repo = await get_repository_record_by_id(repository_id, db)
 
     return RepositoryResponse(
         id=str(repo.id),

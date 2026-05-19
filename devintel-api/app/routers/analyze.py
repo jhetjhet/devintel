@@ -21,7 +21,7 @@ async def trigger_audit(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        result = await start_audit(request.repository_id, request.force, db)
+        result = await start_audit(request.repository_id, request.force, current_user.id, db)
         return AuditResponse(
             repository_id=result["repository_id"],
             commit_hash=result["commit_hash"],
@@ -39,7 +39,7 @@ async def analyze(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        return await analyze_repository(request.repo_url, db)
+        return await analyze_repository(request.repo_url, current_user.id, db)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -51,9 +51,10 @@ async def get_analysis_result(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        return await process_analysis_result(repository_id, db)
+        return await process_analysis_result(repository_id, current_user.id, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 @router.get("/api/analysis/{repository_id}/status/")
 async def analysis_status(
@@ -62,7 +63,7 @@ async def analysis_status(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        return await get_analysis_status(repository_id, db)
+        return await get_analysis_status(repository_id, current_user.id, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -85,7 +86,7 @@ async def list_reports(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        return await list_analysis_runs(repository_id, db)
+        return await list_analysis_runs(repository_id, current_user.id, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
