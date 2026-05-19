@@ -9,6 +9,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { AuthUser } from "@/types/auth";
+import { SignInRequiredModal } from "./SignInRequiredModal";
+import { AuthModal } from "./AuthModal";
 
 const GithubIcon = () => (
   <svg
@@ -36,8 +38,16 @@ export default function HomeContent({ user }: HomeContentProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [analyzeRepoPending, startAnalyzeRepoTransition] = useTransition();
+  const [showSignInRequired, setShowSignInRequired] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    if (repoUrl.trim() === "") {
+      e.preventDefault();
+      setErrorMessage("Please enter a repository URL.");
+      return;
+    }
+
     e.preventDefault();
     setErrorMessage(null);
 
@@ -48,10 +58,16 @@ export default function HomeContent({ user }: HomeContentProps) {
         console.log("Repository Analysis Result:", response.data);
         router.push(`/analysis/${response.data.id}`);
       } else {
-        console.error("Error analyzing repository:", response.error);
-        setErrorMessage(
-          response.error?.message || "An unexpected error occurred.",
-        );
+        if (response.status === 401) {
+          setShowSignInRequired(true);
+          return;
+        }
+        else {
+          console.error("Error analyzing repository:", response.error);
+          setErrorMessage(
+            response.error?.message || "An unexpected error occurred.",
+          );
+        }
       }
     });
   };
@@ -105,6 +121,20 @@ export default function HomeContent({ user }: HomeContentProps) {
       <div className="grid grid-cols-2 gap-4">
         <HomeIconCards />
       </div>
+
+      <SignInRequiredModal
+        isOpen={showSignInRequired}
+        onClose={() => setShowSignInRequired(false)}
+        onSignIn={() => {
+          setShowSignInRequired(false);
+          setShowAuthModal(true);
+        }}
+      />
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+      />
     </motion.div>
   );
 }
