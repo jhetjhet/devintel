@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
+from app.admin import setup_admin
 from app.routers import analyze, auth
 from app.socket.handlers import sio
 
@@ -25,6 +26,7 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(auth.router)
+setup_admin(app)
 
 
 @app.on_event("startup")
