@@ -216,6 +216,7 @@ export const RepositoryDetailsSchema = z.object({
   provider: z.string().nullable(),
   owner_name: z.string().nullable(),
   repo_name: z.string().nullable(),
+  user_id: z.string().nullable(),
 });
 
 // ---------------------------------------------------------------------------

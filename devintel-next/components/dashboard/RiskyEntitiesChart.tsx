@@ -51,7 +51,7 @@ export function RiskyEntitiesChart({ entities }: RiskyEntitiesChartProps) {
             No risky entities detected
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <BarChart data={topEntities} layout="vertical" margin={{ left: 8, right: 16 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis
