@@ -8,8 +8,6 @@ import { QuickWins } from "./dashboard/QuickWins";
 import { FileStructure } from "./dashboard/FileStructure";
 import { SecurityAudit } from "./dashboard/SecurityAudit";
 import { RefactorLab } from "./dashboard/RefactorLab";
-import { AuditHistory } from "./dashboard/AuditHistory";
-import { TrendsChart } from "./dashboard/TrendsChart";
 import { RiskyEntitiesChart } from "./dashboard/RiskyEntitiesChart";
 import { DependenciesHealth } from "./dashboard/DependenciesHealth";
 import { LanguageFrameworkDistribution } from "./dashboard/LanguageFrameworkDistribution";
@@ -19,8 +17,8 @@ import {
   AnalysisRunSummarySchema,
   RepositoryDetails,
 } from "@/types/repository";
-import useSWR from "swr";
 import { AuthUser } from "@/types/auth";
+import GrowthReportContainer from "./dashboard/GrowthReportContainer";
 
 async function fetchReporsts(
   repositoryId: string,
@@ -57,31 +55,8 @@ type DashboardProps = {
 
 export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardProps) {
   const [selectedRefactor, setSelectedRefactor] = useState(0);
-  const [activeMetric, setActiveMetric] = useState<"debt" | "score">("score");
 
-  const repositoryId = repositoryDetails.id;
-
-  const { data: reportHistory, isLoading: reportHistoryLoading } = useSWR(
-    `repository-${repositoryId}-reports`,
-    () => fetchReporsts(repositoryId),
-  );
-
-  const trendData = (reportHistory ?? [])
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(a.scanned_at ?? a.created_at).getTime() -
-        new Date(b.scanned_at ?? b.created_at).getTime(),
-    )
-    .slice(-12)
-    .map((run) => {
-      const d = new Date(run.scanned_at ?? run.created_at);
-      return {
-        day: `${d.getMonth() + 1}/${d.getDate()}`,
-        debt: run.technical_debt_score ?? 0,
-        score: run.overall_score ?? 0,
-      };
-    });
+  const showGrowthReport = user && repositoryDetails.user_id === user.id;
 
   const currentRefactor =
     reportDetails.refactor_suggestions[selectedRefactor];
@@ -110,12 +85,14 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
             >
               Structured Report
             </TabsTrigger>
-            <TabsTrigger
-              value="growth_report"
-              className="data-active:bg-primary data-active:text-white"
-            >
-              Growth Report
-            </TabsTrigger>
+            {showGrowthReport && (
+              <TabsTrigger
+                value="growth_report"
+                className="data-active:bg-primary data-active:text-white"
+              >
+                Growth Report
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="structured_report" className="mt-6">
@@ -220,20 +197,12 @@ export function Dashboard({ user, repositoryDetails, reportDetails }: DashboardP
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="growth_report" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-              <AuditHistory
-                runs={reportHistory ?? []}
-                isLoading={reportHistoryLoading}
-              />
-              
-              <TrendsChart
-                trendData={trendData}
-                activeMetric={activeMetric}
-                setActiveMetric={setActiveMetric}
-              />
-            </div>
-          </TabsContent>
+          {showGrowthReport && (
+            <TabsContent value="growth_report" className="mt-6">
+              <GrowthReportContainer repositoryId={repositoryDetails.id} />
+            </TabsContent>
+          )}
+
         </Tabs>
       </div>
     </div>

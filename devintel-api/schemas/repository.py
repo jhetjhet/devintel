@@ -11,6 +11,7 @@ class RepositoryResponse(BaseModel):
     provider: str | None = None
     owner_name: str | None = None
     repo_name: str | None = None
+    user_id: str | None = None
 
 
 class AuditRequest(BaseModel):

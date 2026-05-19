@@ -32,7 +32,9 @@ export function LanguageFrameworkDistribution({
   languages,
   frameworks,
 }: LanguageFrameworkDistributionProps) {
-  const allItems = [...(languages ?? []), ...(frameworks ?? [])].filter(Boolean);
+  const allItems = [...(languages ?? []), ...(frameworks ?? [])].filter(
+    Boolean,
+  );
 
   const aggregated = Array.from(
     allItems.reduce((map, name) => {
@@ -64,7 +66,7 @@ export function LanguageFrameworkDistribution({
         ) : (
           <div className="flex items-center gap-6">
             <div className="h-48 w-48 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={192}>
                 <PieChart>
                   <Pie
                     data={aggregated}

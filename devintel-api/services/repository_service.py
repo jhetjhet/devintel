@@ -100,6 +100,7 @@ async def analyze_repository(
         provider=repo.provider,
         owner_name=repo.owner_name,
         repo_name=repo.repo_name,
+        user_id=str(repo.user_id) if repo.user_id else None,
     )
 
 
@@ -116,4 +117,5 @@ async def get_repository_by_id(
         provider=repo.provider,
         owner_name=repo.owner_name,
         repo_name=repo.repo_name,
+        user_id=str(repo.user_id) if repo.user_id else None,
     )
