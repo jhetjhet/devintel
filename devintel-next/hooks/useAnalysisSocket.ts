@@ -32,13 +32,11 @@ export default function useAnalysisSocket(
     });
 
     socket.on("initial_progress", ({ progress }: { progress: number }) => {
-      console.log("Initial progress:", progress);
       setProgress(progress);
     });
 
     socket.on("progress", (data: AuditProgress) => {
       if (data.progress_percent) {
-        console.log("Progress update:", data.progress_percent, data.level, data.logger, data.message, data.progress_stage);
         setProgress(data.progress_percent);
       }
 
