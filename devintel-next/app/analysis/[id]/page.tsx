@@ -4,8 +4,6 @@ import { AnalysisInPending } from '@/components/AnalysisInPending';
 import { fetchAnalysisStatus } from '@/lib/api.server';
 import { redirect } from 'next/navigation';
 
-export const dynamic = "force-dynamic";
-
 type AnalysisPageProps = {
   params: {
     id: string;
@@ -16,8 +14,6 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
   const { id } = await params;
 
   const analysisStatus = await fetchAnalysisStatus(id);
-
-  console.log("Fetched analysis status:", analysisStatus);
 
   if (!analysisStatus.recent_analysis_run) {
     const response = await startAudit(id);

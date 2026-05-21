@@ -65,7 +65,6 @@ export function Dashboard({
   const [selectedRefactor, setSelectedRefactor] = useState(0);
 
   const showGrowthReport = user && repositoryDetails.user_id === user.id;
-  console.log("reportDetails:", reportDetails);
   const currentRefactor = reportDetails.refactor_suggestions[selectedRefactor];
   const refactorDiff = currentRefactor
     ? {

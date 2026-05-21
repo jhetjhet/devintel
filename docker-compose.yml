@@ -1,58 +1,58 @@
 services:
   postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
     environment:
-      POSTGRES_USER: devintel
-      POSTGRES_PASSWORD: devintel
-      POSTGRES_DB: devintel
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-devintel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devintel}
+      POSTGRES_DB: ${POSTGRES_DB:-devintel}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devintel"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devintel}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - internal_net
+    expose:
+      - 5432
 
   devintel-api:
-    build:
-      context: ./devintel-api
-    restart: unless-stopped
+    image: snits/devintel-api:${DEVINTEL_API_VERSION:-latest}
     env_file:
       - ./devintel-api/.env
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./devintel-api:/app
-      # Mount host Docker socket so the API can spawn worker containers
-      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - devintel_net
       - internal_net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "${DEVINTEL_API_PORT:-8000}:8000"
+
+  devintel-migrate:
+    image: snits/devintel-api:${DEVINTEL_API_VERSION:-latest}
+    env_file:
+      - ./devintel-api/.env
+    command: alembic upgrade head
+    restart: "no"
+    networks:
+      - internal_net
 
   devintel-next:
-    build:
-      context: ./devintel-next
-    restart: unless-stopped
-    volumes:
-      - ./devintel-next:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
+    image: snits/devintel-next:${DEVINTEL_NEXT_VERSION:-latest}
+    env_file:
+      - ./devintel-next/.env
     depends_on:
       devintel-api:
         condition: service_started
     networks:
       - internal_net
-    environment:
-      CI: true
+      - devintel_net
+    ports:
+      - "${DEVINTEL_NEXT_PORT:-3000}:3000"
 
 networks:
   devintel_net:

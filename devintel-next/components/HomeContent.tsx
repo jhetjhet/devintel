@@ -55,7 +55,6 @@ export default function HomeContent({ user }: HomeContentProps) {
       const response = await analyzeRepo(repoUrl);
 
       if (response.success) {
-        console.log("Repository Analysis Result:", response.data);
         router.push(`/analysis/${response.data.id}`);
       } else {
         if (response.status === 401) {
