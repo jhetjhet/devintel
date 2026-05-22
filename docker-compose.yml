@@ -21,6 +21,8 @@ services:
     image: snits/devintel-api:${DEVINTEL_API_VERSION:-latest}
     env_file:
       - ./devintel-api/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-devintel}:${POSTGRES_PASSWORD:-devintel}@postgres:5432/${POSTGRES_DB:-devintel}
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,6 +38,8 @@ services:
     image: snits/devintel-api:${DEVINTEL_API_VERSION:-latest}
     env_file:
       - ./devintel-api/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-devintel}:${POSTGRES_PASSWORD:-devintel}@postgres:5432/${POSTGRES_DB:-devintel}
     command: alembic upgrade head
     restart: "no"
     networks:

@@ -94,7 +94,6 @@ DEVINTEL_NEXT_PORT=3000
 Set these in devintel-api/.env:
 
 ```env
-DATABASE_URL=postgresql+asyncpg://devintel:devintel@postgres:5432/devintel
 REDIS_URL=redis://redis:6379
 
 LLM_API_KEY=<your-key-or-placeholder>
