@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: str = "*" # Comma-separated list of allowed hosts for TrustedHostMiddleware
     ALLOWED_ORIGINS: str = "*" # Comma-separated list of allowed origins for CORS
 
+    DEBUG: bool = False
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 

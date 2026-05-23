@@ -48,7 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if not is_production:
+if settings.DEBUG:
     @app.middleware("http")
     async def debug_everything(request: Request, call_next):
         print("\n=== RAW REQUEST DEBUG ===")
