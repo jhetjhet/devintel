@@ -13,6 +13,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+    command: ["sh", "-c", "uvicorn app.main:socket_app --host 0.0.0.0 --port 8000 --proxy-headers"]
 
   devintel-next:
     build: !reset null
