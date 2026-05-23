@@ -63,6 +63,7 @@ def _ensure_container_running(job_id: str) -> None:
             "LLM_API_KEY": settings.LLM_API_KEY,
             "LLM_MODEL": settings.LLM_MODEL,
             "LLM_BASE_URL": settings.LLM_BASE_URL,
+            "REDIS_TTL_SECONDS": settings.ENGINE_REDIS_TTL_SECONDS,
         },
         network="devintel_net",
         # Allows the worker container to reach the host via host.docker.internal on Linux
