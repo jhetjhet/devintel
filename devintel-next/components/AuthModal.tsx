@@ -144,7 +144,7 @@ export function AuthModal({
               </div>
               <button
                 onClick={closeModal}
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+                className="cursor-pointer w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all"
               >
                 <X size={20} />
               </button>
@@ -187,6 +187,7 @@ export function AuthModal({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     type="text"
+                    spellCheck={false}
                     placeholder="Full Name"
                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm"
                   />
@@ -201,6 +202,7 @@ export function AuthModal({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   type="email"
+                  spellCheck={false}
                   placeholder="Email address"
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm"
                 />
