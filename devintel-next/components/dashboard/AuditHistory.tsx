@@ -81,83 +81,87 @@ export function AuditHistory({ runs, isLoading = false }: AuditHistoryProps) {
                 <th className="pb-3 text-right">Verdict</th>
               </tr>
             </thead>
-            <tbody className="text-xs">
-              {runs.map((run, i) => {
-                const score = run.overall_score ?? 0;
-                const techDebt = run.technical_debt_score ?? 0;
-                const date = run.scanned_at ?? run.created_at;
-
-                return (
-                  <tr
-                    key={run.id ?? i}
-                    className="group hover:bg-white/5 transition-colors cursor-pointer border-b border-white/5 last:border-0 relative"
-                  >
-                    <td className="py-4 pl-4 font-mono text-primary font-bold relative">
-                      <div className="absolute left-[-2px] top-1/2 -translate-y-1/2 w-1 h-0 bg-primary group-hover:h-2/3 transition-all rounded-full" />
-
-                      {run.commit_hash?.slice(0, 7) ?? "—"}
-                    </td>
-                    <td className="text-white/60">
-                      {new Date(date).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 pr-4">
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="font-bold text-white tracking-widest">
-                          {score}
-                        </span>
-                        <div className="w-20 h-1 bg-white/10 rounded-full overflow-hidden">
-                          <div
-                            className={cn(
-                              "h-full transition-all duration-1000",
-                              score > 80
-                                ? "bg-secondary"
-                                : score > 60
-                                  ? "bg-primary"
-                                  : "bg-destructive",
-                            )}
-                            style={{ width: `${score}%` }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 pr-4 text-center">
-                      <span
-                        className={cn(
-                          "font-mono font-bold",
-                          techDebt < 30
-                            ? "text-secondary"
-                            : techDebt < 50
-                              ? "text-warning"
-                              : "text-destructive",
-                        )}
-                      >
-                        {techDebt}%
-                      </span>
-                    </td>
-                    <td className="py-4 pr-4 text-right">
-                      <span
-                        className={cn(
-                          "px-2 py-1 rounded text-[12px] font-bold border",
-                          score > 80
-                            ? "bg-secondary/10 text-secondary border-secondary/20"
-                            : score > 70
-                              ? "bg-primary/10 text-primary border-primary/20"
-                              : "bg-white/5 text-white/40 border-white/10",
-                        )}
-                      >
-                        {run.overall_verdict ??
-                          (score > 80
-                            ? "Production Ready"
-                            : score > 70
-                              ? "Stable"
-                              : "Audit Required")}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
           </table>
+          <div className="max-h-72 overflow-y-auto min-w-full scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+            <table className="w-full text-left border-collapse min-w-[700px]">
+              <tbody className="text-xs">
+                {runs.map((run, i) => {
+                  const score = run.overall_score ?? 0;
+                  const techDebt = run.technical_debt_score ?? 0;
+                  const date = run.scanned_at ?? run.created_at;
+
+                  return (
+                    <tr
+                      key={run.id ?? i}
+                      className="group hover:bg-white/5 transition-colors cursor-pointer border-b border-white/5 last:border-0 relative"
+                    >
+                      <td className="py-4 pl-4 font-mono text-primary font-bold relative">
+                        <div className="absolute left-[-2px] top-1/2 -translate-y-1/2 w-1 h-0 bg-primary group-hover:h-2/3 transition-all rounded-full" />
+
+                        {run.commit_hash?.slice(0, 7) ?? "—"}
+                      </td>
+                      <td className="text-white/60">
+                        {new Date(date).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 pr-4">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="font-bold text-white tracking-widest">
+                            {score}
+                          </span>
+                          <div className="w-20 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full transition-all duration-1000",
+                                score > 80
+                                  ? "bg-secondary"
+                                  : score > 60
+                                    ? "bg-primary"
+                                    : "bg-destructive",
+                              )}
+                              style={{ width: `${score}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 pr-4 text-center">
+                        <span
+                          className={cn(
+                            "font-mono font-bold",
+                            techDebt < 30
+                              ? "text-secondary"
+                              : techDebt < 50
+                                ? "text-warning"
+                                : "text-destructive",
+                          )}
+                        >
+                          {techDebt}%
+                        </span>
+                      </td>
+                      <td className="py-4 pr-4 text-right">
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded text-[12px] font-bold border",
+                            score > 80
+                              ? "bg-secondary/10 text-secondary border-secondary/20"
+                              : score > 70
+                                ? "bg-primary/10 text-primary border-primary/20"
+                                : "bg-white/5 text-white/40 border-white/10",
+                          )}
+                        >
+                          {run.overall_verdict ??
+                            (score > 80
+                              ? "Production Ready"
+                              : score > 70
+                                ? "Stable"
+                                : "Audit Required")}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </CardContent>
     </Card>

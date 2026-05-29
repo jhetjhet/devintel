@@ -38,6 +38,7 @@ export function Analysis({ repositoryId }: AnalysisProps) {
       });
     },
     (data) => {
+      // TODO: display error in UI
       console.error("Analysis error:", data);
     },
   );

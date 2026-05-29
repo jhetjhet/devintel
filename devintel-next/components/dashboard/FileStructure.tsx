@@ -16,6 +16,12 @@ export function FileStructure({ file_health_entries, architectural_recommendatio
         <CardTitle className="text-white/60 text-sm font-mono uppercase tracking-widest">Health-Coded File Structure</CardTitle>
       </CardHeader>
       <CardContent className="px-6 pb-6">
+        {(file_health_entries.length === 0 && architectural_recommendations.length === 0) && (
+          <div className="flex items-center justify-center h-full text-white/30 text-sm font-mono">
+            No file health data available
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {file_health_entries.map((folder, i) => (
             <div key={i} className="p-4 border border-white/5 bg-black/20 rounded-xl hover:bg-black/40 transition-all cursor-pointer group">
