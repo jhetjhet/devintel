@@ -17,6 +17,12 @@ export function QuickWins({ quick_wins }: QuickWinsProps) {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[200px] pr-4">
+          {quick_wins.length === 0 && (
+            <div className="flex items-center justify-center h-full text-white/30 text-sm font-mono">
+              No quick wins detected.
+            </div>
+          )}
+
           <div className="space-y-3">
             {quick_wins.map((win, i) => (
               <div

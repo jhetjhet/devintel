@@ -89,6 +89,7 @@ export default function HomeContent({ user }: HomeContentProps) {
               type="text"
               name="repo_url"
               value={repoUrl}
+              spellCheck={false}
               onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="github.com/org/repo"
               className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-lg"
