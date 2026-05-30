@@ -72,8 +72,8 @@ export default function ReportsPageContents({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto min-w-full">
-            <div className="w-full">
+          <div className="overflow-x-auto min-w-full overflow-x-auto scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+            <div className="w-full min-w-[700px]">
               <table className="table-fixed w-full">
                 <colgroup>
                   <col className="w-[20%]" />
@@ -86,7 +86,7 @@ export default function ReportsPageContents({
                 <thead>
                   <tr className="border-b border-white/5 text-[12px] font-mono text-white/40 uppercase">
                     <th className="text-left pb-3">Name</th>
-                    <th className="text-left pb-3">URL</th>
+                    <th className="text-left pb-3">Repo</th>
                     <th className="text-left pb-3">Last Commit</th>
                     <th className="text-left pb-3">Last Scanned</th>
                     <th className="text-left pb-3">Reports</th>
@@ -95,7 +95,7 @@ export default function ReportsPageContents({
               </table>
 
               <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
-                <table className="table-fixed w-full min-w-[700px]">
+                <table className="table-fixed w-full">
                   <colgroup>
                     <col className="w-[20%]" />
                     <col className="w-[35%]" />
