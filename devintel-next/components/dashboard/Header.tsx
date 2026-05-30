@@ -50,7 +50,7 @@ export function Header({ repositoryDetails, reportDetails }: HeaderProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-4 w-full md:w-auto">
+      <div className="flex items-end flex-col gap-4 w-full md:w-auto md:flex-row md:items-center">
         <Link
           href="/"
           className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-white/50 hover:text-primary text-xs font-mono font-bold uppercase tracking-widest transition-all"
