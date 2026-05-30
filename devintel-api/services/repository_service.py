@@ -1,10 +1,9 @@
+
 import uuid
 from urllib.parse import urlparse
-
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.models import Repository
+from app.models import Repository, AnalysisRun
 from schemas.repository import RepositoryResponse
 from utils.repo_meta import get_repo_metadata
 
@@ -103,6 +102,45 @@ async def analyze_repository(
         user_id=str(repo.user_id) if repo.user_id else None,
     )
 
+async def list_repositories(
+    user_id: str | uuid.UUID,
+    db: AsyncSession,
+) -> list[RepositoryResponse]:
+    """Return all repositories for a given user_id as RepositoryResponse list, with report_count."""
+    user_uuid = _normalize_uuid(user_id, "user ID")
+    # Get all repositories for the user
+    stmt = select(Repository).where(Repository.user_id == user_uuid)
+    result = await db.execute(stmt)
+    repos = result.scalars().all()
+
+    # Get report counts for all repos in one query
+    repo_ids = [repo.id for repo in repos]
+    if not repo_ids:
+        return []
+    count_stmt = (
+        select(AnalysisRun.repository_id, func.count(AnalysisRun.id))
+        .where(AnalysisRun.repository_id.in_(repo_ids))
+        .group_by(AnalysisRun.repository_id)
+    )
+    count_result = await db.execute(count_stmt)
+    counts = dict(count_result.all())
+    
+    return [
+        RepositoryResponse(
+            id=str(repo.id),
+            user_id=str(repo.user_id),
+            repo_url=repo.repo_url,
+            provider=repo.provider,
+            owner_name=repo.owner_name,
+            repo_name=repo.repo_name,
+            first_seen_at=str(repo.first_seen_at),
+            latest_commit_hash=repo.latest_commit_hash,
+            last_scanned_at=str(repo.last_scanned_at),
+            is_active=repo.is_active,
+            report_count=counts.get(repo.id, 0),
+        )
+        for repo in repos
+    ]
 
 async def get_repository_by_id(
     repository_id: str,

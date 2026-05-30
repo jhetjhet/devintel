@@ -1,40 +1,8 @@
-import {
-  AnalysisRunSummary,
-  AnalysisRunSummarySchema,
-} from "@/types/repository";
 import useSWR from "swr";
 import { AuditHistory } from "./AuditHistory";
 import { TrendsChart } from "./TrendsChart";
 import { useState } from "react";
-
-async function fetchReporsts(
-  repositoryId: string,
-): Promise<AnalysisRunSummary[]> {
-  try {
-    const response = await fetch(
-      `/fast-api/repositories/${repositoryId}/reports/`,
-    );
-
-    if (!response.ok) {
-      console.error("Failed to fetch reports:", await response.text());
-      return [];
-    }
-
-    const data = await response.json();
-
-    const dataRes = AnalysisRunSummarySchema.array().safeParse(data);
-
-    if (!dataRes.success) {
-      console.error("Invalid reports data format:", dataRes.error);
-      return [];
-    }
-
-    return dataRes.data;
-  } catch (error) {
-    console.error("Failed to fetch reports:", error);
-    return [];
-  }
-}
+import { fetchReports } from "@/lib/api.client";
 
 type GrowthReportContainerProps = {
   repositoryId: string;
@@ -47,7 +15,7 @@ export default function GrowthReportContainer({
 
   const { data: reportHistory, isLoading: reportHistoryLoading } = useSWR(
     `repository-${repositoryId}-reports`,
-    () => fetchReporsts(repositoryId),
+    () => fetchReports(repositoryId),
   );
 
   const trendData = (reportHistory ?? [])

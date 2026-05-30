@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models import User
 from schemas.repository import AnalyzeRequest, RepositoryResponse, AuditRequest, AuditResponse
 from schemas.analysis import AnalysisRunSummary, AnalysisRunDetail
-from services.repository_service import analyze_repository, get_repository_by_id
+from services.repository_service import analyze_repository, get_repository_by_id, list_repositories
 from services.analysis_service import process_analysis_result, get_analysis_status
 from services.report_service import list_analysis_runs, get_analysis_run_detail, get_analysis_run_detail_by_id
 from services.audit_service import start_audit, WorkerLimitReachedError
@@ -64,6 +64,17 @@ async def analysis_status(
 ):
     try:
         return await get_analysis_status(repository_id, current_user.id, db)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/api/repositories/", response_model=list[RepositoryResponse])
+async def get_list_repositories(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        return await list_repositories(current_user.id, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

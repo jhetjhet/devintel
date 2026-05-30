@@ -12,9 +12,10 @@ import { AnalysisRunSummary } from "@/types/repository";
 interface AuditHistoryProps {
   runs: AnalysisRunSummary[];
   isLoading?: boolean;
+  onReportSelect?: (report: AnalysisRunSummary) => void;
 }
 
-export function AuditHistory({ runs, isLoading = false }: AuditHistoryProps) {
+export function AuditHistory({ runs, isLoading = false, onReportSelect }: AuditHistoryProps) {
   if (isLoading) {
     return (
       <Card className="bg-surface border-white/5 col-span-1 md:col-span-3 lg:col-span-4">
@@ -93,6 +94,7 @@ export function AuditHistory({ runs, isLoading = false }: AuditHistoryProps) {
                   return (
                     <tr
                       key={run.id ?? i}
+                      onClick={() => onReportSelect?.(run)}
                       className="group hover:bg-white/5 transition-colors cursor-pointer border-b border-white/5 last:border-0 relative"
                     >
                       <td className="py-4 pl-4 font-mono text-primary font-bold relative">
@@ -148,12 +150,7 @@ export function AuditHistory({ runs, isLoading = false }: AuditHistoryProps) {
                                 : "bg-white/5 text-white/40 border-white/10",
                           )}
                         >
-                          {run.overall_verdict ??
-                            (score > 80
-                              ? "Production Ready"
-                              : score > 70
-                                ? "Stable"
-                                : "Audit Required")}
+                          {score === 0 ? "No Verdict" : run.overall_verdict}
                         </span>
                       </td>
                     </tr>
