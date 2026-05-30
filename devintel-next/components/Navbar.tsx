@@ -4,14 +4,17 @@ import { AuthUser } from "@/types/auth";
 import { Button } from "./ui/button";
 import { AuthModal } from "./AuthModal";
 import { useState, useTransition } from "react";
-import { User } from "lucide-react";
+import { ChartBar, User } from "lucide-react";
 import { signOut } from "@/app/actions/authentication";
+import { useRouter } from "next/navigation";
 
 type NavbarProps = {
   user: AuthUser | null;
 };
 
 export default function Navbar({ user }: NavbarProps) {
+  const router = useRouter();
+
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
 
@@ -40,6 +43,14 @@ export default function Navbar({ user }: NavbarProps) {
               disabled={signoutPending}
             >
               {signoutPending ? "Signing Out..." : "Sign Out"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/reports")}
+            >
+              <ChartBar size={14} />
+              Rports
             </Button>
           </div>
         )}

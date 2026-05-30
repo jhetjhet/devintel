@@ -212,11 +212,16 @@ export const AnalysisStatusResponseSchema = z.object({
 
 export const RepositoryDetailsSchema = z.object({
   id: z.string(),
+  user_id: z.string().nullable(),
   repo_url: z.string(),
   provider: z.string().nullable(),
-  owner_name: z.string().nullable(),
   repo_name: z.string().nullable(),
-  user_id: z.string().nullable(),
+  owner_name: z.string().nullable(),
+  first_seen_at: z.string().nullable(),
+  latest_commit_hash: z.string().nullable(),
+  last_scanned_at: z.string().nullable(),
+  is_active: z.boolean(),
+  report_count: z.number().default(0),
 });
 
 // ---------------------------------------------------------------------------

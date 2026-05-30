@@ -1,6 +1,8 @@
 import {
   AnalysisStatusResponse,
   AnalysisStatusResponseSchema,
+  RepositoryDetails,
+  RepositoryDetailsSchema,
 } from "@/types/repository";
 import authFetch from "./auth-fetch";
 import { AuthUser, UserSchema } from "@/types/auth";
@@ -54,5 +56,32 @@ export async function fetchUserInfo(): Promise<AuthUser | null> {
   } catch (error) {
     console.error("Error fetching user info:", error);
     return null;
+  }
+}
+
+export async function fetchRepoAnalysis(): Promise<RepositoryDetails[]> {
+  try {
+    const response = await authFetch(`${process.env.API_ENDPOINT}/api/repositories/`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch repository analysis:", await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+
+    const useRes = RepositoryDetailsSchema.array().safeParse(data);
+
+    if (!useRes.success) {
+      console.error("Invalid repository analysis response:", useRes.error);
+      return [];
+    }
+
+    return useRes.data;
+  } catch (error) {
+    console.error("Error fetching repository analysis:", error);
+    return [];
   }
 }
