@@ -32,7 +32,7 @@ export default function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="w-full border-b border-gray-200">
+    <nav className="w-full">
       <div className="absolute top-0 right-0 p-8 z-[50]">
         {user && (
           <div className="flex gap-4">
