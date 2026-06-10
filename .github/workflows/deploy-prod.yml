@@ -103,3 +103,23 @@ jobs:
           echo "|---------|-----|" >> "$GITHUB_STEP_SUMMARY"
           echo "| devintel-api  | \`${{ steps.version.outputs.VERSION }}\`, \`latest\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| devintel-next | \`${{ steps.version.outputs.VERSION }}\`, \`latest\` |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Copy compose file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: docker-compose.yml,docker-compose.prod.yml
+          target: ${{ secrets.SERVER_APP_DIR }}
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ${{ secrets.SERVER_APP_DIR }}
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml pull devintel-api devintel-next
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d devintel-api devintel-next
