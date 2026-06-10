@@ -34,6 +34,9 @@ jobs:
       contents: read
 
     steps:
+      - name: Debug username
+        run: echo "USERNAME=${{ vars.DOCKERHUB_USERNAME }}"
+
       - name: Checkout
         uses: actions/checkout@v4
 
