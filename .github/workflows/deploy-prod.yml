@@ -43,7 +43,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Short SHA used as a unique, traceable image tag per commit.
@@ -80,13 +80,13 @@ jobs:
       # (which defaults to :latest) always has a fresh image to pull.
       - name: Retag and push :latest
         run: |
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/devintel-api:${{ steps.version.outputs.VERSION }} \
-                     ${{ secrets.DOCKERHUB_USERNAME }}/devintel-api:latest
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/devintel-next:${{ steps.version.outputs.VERSION }} \
-                     ${{ secrets.DOCKERHUB_USERNAME }}/devintel-next:latest
+          docker tag ${{ vars.DOCKERHUB_USERNAME }}/devintel-api:${{ steps.version.outputs.VERSION }} \
+                     ${{ vars.DOCKERHUB_USERNAME }}/devintel-api:latest
+          docker tag ${{ vars.DOCKERHUB_USERNAME }}/devintel-next:${{ steps.version.outputs.VERSION }} \
+                     ${{ vars.DOCKERHUB_USERNAME }}/devintel-next:latest
 
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/devintel-api:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/devintel-next:latest
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/devintel-api:latest
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/devintel-next:latest
 
       - name: Summary
         run: |
