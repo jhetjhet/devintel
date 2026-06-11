@@ -96,7 +96,7 @@ export function AnalysisCompleted({ analysisStatus }: AnalysisCompletedProps) {
                 Commit
               </span>
               <span className="text-white/60">
-                {analysisStatus.commit_hash.slice(0, 7) ?? "—"}
+                {analysisStatus?.recent_analysis_run?.commit_hash?.slice(0, 7) ?? "—"}
               </span>
             </div>
           </div>
