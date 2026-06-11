@@ -104,6 +104,19 @@ jobs:
           echo "| devintel-api  | \`${{ steps.version.outputs.VERSION }}\`, \`latest\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| devintel-next | \`${{ steps.version.outputs.VERSION }}\`, \`latest\` |" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Copy env files to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            mkdir -p ${{ secrets.SERVER_APP_DIR }}/devintel-api
+            mkdir -p ${{ secrets.SERVER_APP_DIR }}/devintel-next
+            cp ${{ secrets.SERVER_BASE_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/.env
+            cp ${{ secrets.SERVER_API_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/devintel-api/.env
+            cp ${{ secrets.SERVER_NEXT_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/devintel-next/.env
+
       - name: Copy compose file to server
         uses: appleboy/scp-action@v0.1.7
         with:
