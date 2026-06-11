@@ -15,11 +15,11 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 
   const analysisStatus = await fetchAnalysisStatus(id);
 
-  if (!analysisStatus.recent_analysis_run) {
+  if (!analysisStatus.recent_analysis_run || analysisStatus.recent_commit_hash !== analysisStatus.recent_analysis_run.commit_hash) {
     const response = await startAudit(id);
 
     if (!response.success) {
-      if (response.status === 429) {
+      if (response.status === 429) {  
         throw new Error("Due to resource constraints, we are currently limiting the number of concurrent analyses. Please try again in a few minutes.");
       }
       else {
@@ -35,7 +35,7 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
   }
 
   if (analysisStatus.has_pending_result) {
-    return <AnalysisInPending repositoryId={id} commitHash={analysisStatus.commit_hash} />;
+    return <AnalysisInPending repositoryId={id} commitHash={analysisStatus?.recent_analysis_run?.commit_hash} />;
   }
 
   if (analysisStatus.recent_analysis_run && !analysisStatus.has_pending_result) {

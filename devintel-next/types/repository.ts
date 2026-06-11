@@ -203,7 +203,7 @@ export const AnalysisRunDetailSchema = AnalysisRunSummarySchema.merge(
 
 export const AnalysisStatusResponseSchema = z.object({
   repository_id: z.string(),
-  commit_hash: z.string(),
+  recent_commit_hash: z.string(),
   recent_analysis_run: PartialAnalysisRunSummarySchema.nullable(),
   analysis_run_count: z.number(),
   has_pending_result: z.boolean(),
