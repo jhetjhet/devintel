@@ -60,7 +60,7 @@ jobs:
           touch devintel-api/.env
           touch devintel-next/.env
 
-      # The override file supplies the build: contexts (./devintel-api, ./devintel-next).
+      # The prod file supplies the build: contexts (./devintel-api, ./devintel-next).
       # Locally it is auto-merged; in CI we must be explicit.
       # We do NOT include docker-compose.prod.yml here because it resets build: to null —
       # that file is only for the runtime stack on the server.
@@ -71,7 +71,7 @@ jobs:
         run: |
           docker compose \
             -f docker-compose.yml \
-            -f docker-compose.override.yml \
+            -f docker-compose.prod.yml \
             build
 
       - name: Push versioned images
@@ -81,7 +81,7 @@ jobs:
         run: |
           docker compose \
             -f docker-compose.yml \
-            -f docker-compose.override.yml \
+            -f docker-compose.prod.yml \
             push devintel-api devintel-next
 
       # Keep 'latest' in sync so your server's docker-compose.prod.yml
