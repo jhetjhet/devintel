@@ -111,11 +111,26 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            set -eu
+            BASE_ENV_FILE="${{ secrets.SERVER_BASE_ENV_FILE }}"
+            API_ENV_FILE="${{ secrets.SERVER_API_ENV_FILE }}"
+            NEXT_ENV_FILE="${{ secrets.SERVER_NEXT_ENV_FILE }}"
+
+            if [ -z "$BASE_ENV_FILE" ] || [ -z "$API_ENV_FILE" ] || [ -z "$NEXT_ENV_FILE" ]; then
+              echo "One or more env source path secrets are empty. Check SERVER_BASE_ENV_FILE, SERVER_API_ENV_FILE, SERVER_NEXT_ENV_FILE."
+              exit 1
+            fi
+
             mkdir -p ${{ secrets.SERVER_APP_DIR }}/devintel-api
             mkdir -p ${{ secrets.SERVER_APP_DIR }}/devintel-next
-            cp ${{ secrets.SERVER_BASE_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/.env
-            cp ${{ secrets.SERVER_API_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/devintel-api/.env
-            cp ${{ secrets.SERVER_NEXT_ENV_FILE }} ${{ secrets.SERVER_APP_DIR }}/devintel-next/.env
+
+            [ -f "$BASE_ENV_FILE" ] || { echo "Missing file: $BASE_ENV_FILE"; exit 1; }
+            [ -f "$API_ENV_FILE" ] || { echo "Missing file: $API_ENV_FILE"; exit 1; }
+            [ -f "$NEXT_ENV_FILE" ] || { echo "Missing file: $NEXT_ENV_FILE"; exit 1; }
+
+            cp "$BASE_ENV_FILE" "${{ secrets.SERVER_APP_DIR }}/.env"
+            cp "$API_ENV_FILE" "${{ secrets.SERVER_APP_DIR }}/devintel-api/.env"
+            cp "$NEXT_ENV_FILE" "${{ secrets.SERVER_APP_DIR }}/devintel-next/.env"
 
       - name: Copy compose file to server
         uses: appleboy/scp-action@v0.1.7
