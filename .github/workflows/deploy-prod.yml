@@ -1,26 +1,5 @@
 name: Build & Push — Production
 
-paths-filter: &trigger_paths
-  # API source & config
-  - "devintel-api/app/**"
-  - "devintel-api/requirements.txt"
-  - "devintel-api/alembic/**"
-  - "devintel-api/Dockerfile"
-  # Next.js source & config
-  - "devintel-next/app/**"
-  - "devintel-next/components/**"
-  - "devintel-next/lib/**"
-  - "devintel-next/hooks/**"
-  - "devintel-next/context/**"
-  - "devintel-next/types/**"
-  - "devintel-next/package.json"
-  - "devintel-next/pnpm-lock.yaml"
-  - "devintel-next/Dockerfile"
-  # Compose files
-  - "docker-compose.yml"
-  - "docker-compose.override.yml"
-  - "docker-compose.prod.yml"
-
 on:
   workflow_dispatch:
   pull_request:
@@ -28,7 +7,26 @@ on:
       - main
     types:
       - closed
-    paths: *trigger_paths
+    paths: &trigger_paths
+      # API source & config
+      - "devintel-api/app/**"
+      - "devintel-api/requirements.txt"
+      - "devintel-api/alembic/**"
+      - "devintel-api/Dockerfile"
+      # Next.js source & config
+      - "devintel-next/app/**"
+      - "devintel-next/components/**"
+      - "devintel-next/lib/**"
+      - "devintel-next/hooks/**"
+      - "devintel-next/context/**"
+      - "devintel-next/types/**"
+      - "devintel-next/package.json"
+      - "devintel-next/pnpm-lock.yaml"
+      - "devintel-next/Dockerfile"
+      # Compose files
+      - "docker-compose.yml"
+      - "docker-compose.override.yml"
+      - "docker-compose.prod.yml"
   push:
     branches:
       - main
