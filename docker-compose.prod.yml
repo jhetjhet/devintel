@@ -3,7 +3,6 @@ services:
     restart: always
 
   devintel-api:
-    build: !reset null
     restart: always
     environment:
       ENVIRONMENT: production
@@ -15,7 +14,6 @@ services:
       start_period: 30s
 
   devintel-next:
-    build: !reset null
     restart: always
     depends_on:
       devintel-api:

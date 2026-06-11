@@ -19,6 +19,8 @@ services:
 
   devintel-api:
     image: snits/devintel-api:${DEVINTEL_API_VERSION:-latest}
+    build:
+      context: ./devintel-api
     env_file:
       - ./devintel-api/.env
     environment:
@@ -50,6 +52,8 @@ services:
 
   devintel-next:
     image: snits/devintel-next:${DEVINTEL_NEXT_VERSION:-latest}
+    build:
+      context: ./devintel-next
     env_file:
       - ./devintel-next/.env
     depends_on:

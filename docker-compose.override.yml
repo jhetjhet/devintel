@@ -3,8 +3,6 @@ services:
     restart: unless-stopped
 
   devintel-api:
-    build:
-      context: ./devintel-api
     restart: unless-stopped
     volumes:
       - ./devintel-api:/app
@@ -17,7 +15,6 @@ services:
 
   devintel-next:
     build:
-      context: ./devintel-next
       target: dev
     restart: unless-stopped
     volumes:
