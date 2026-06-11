@@ -42,13 +42,13 @@ export default function HomeContent({ user }: HomeContentProps) {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (repoUrl.trim() === "") {
-      e.preventDefault();
       setErrorMessage("Please enter a repository URL.");
       return;
     }
 
-    e.preventDefault();
     setErrorMessage(null);
 
     startAnalyzeRepoTransition(async () => {

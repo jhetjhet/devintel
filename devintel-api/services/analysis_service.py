@@ -13,7 +13,7 @@ from services.redis_service import (
 )
 from services.repository_service import get_repository_record_by_id
 from utils.analysis_persist import persist_analysis_result
-
+from utils.repo_meta import get_repo_metadata
 
 async def process_analysis_result(
     repository_id: str,
@@ -96,6 +96,7 @@ async def get_analysis_status(
         raise ValueError("Invalid repository ID format.")
 
     repo = await get_repository_record_by_id(repository_id, db, user_id=user_id)
+    repo_meta = get_repo_metadata(repo.repo_url)
 
     _run_filter = (
         AnalysisRun.repository_id == repo_uuid,
@@ -116,37 +117,8 @@ async def get_analysis_status(
         select(func.count()).select_from(AnalysisRun).where(*_run_filter)
     )
     analysis_run_count = count_result.scalar() or 0
-    commit_hash = (recent_run.commit_hash if recent_run else None) or repo.latest_commit_hash or ""
 
     def _serialize_run(run: AnalysisRun) -> dict:
-        print('-' * 20)
-        # print json run
-        print(json.dumps({
-            "id": str(run.id),
-            "job_id": run.job_id,
-            "commit_hash": run.commit_hash,
-            "branch": run.branch,
-            "repo_name": run.repo_name,
-            "overall_score": run.overall_score,
-            "technical_debt_score": run.technical_debt_score,
-            "overall_verdict": run.overall_verdict,
-            "confidence": run.confidence,
-            "total_findings": run.total_findings,
-            "total_smells": run.total_smells,
-            "security_critical_count": run.security_critical_count,
-            "security_high_count": run.security_high_count,
-            "security_medium_count": run.security_medium_count,
-            "security_low_count": run.security_low_count,
-            "duration_ms": run.duration_ms,
-            "started_at": run.started_at.isoformat() if run.started_at else None,
-            "completed_at": run.completed_at.isoformat() if run.completed_at else None,
-            "with_llm": run.with_llm,
-            "metadata_snapshot": run.metadata_snapshot,
-            "scanned_at": run.scanned_at.isoformat() if run.scanned_at else None,
-            "created_at": run.created_at.isoformat(),
-        }, indent=2))
-        print('-' * 20)
-
         return {
             "id": str(run.id),
             "job_id": run.job_id,
@@ -175,7 +147,7 @@ async def get_analysis_status(
     def _make_response(has_pending_result: bool, analysis_status: str | None) -> dict:
         return {
             "repository_id": repository_id,
-            "commit_hash": commit_hash,
+            "recent_commit_hash": repo_meta.latest_commit_hash,
             "recent_analysis_run": _serialize_run(recent_run) if recent_run else None,
             "analysis_run_count": analysis_run_count,
             "has_pending_result": has_pending_result,
